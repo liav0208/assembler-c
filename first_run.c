@@ -11,8 +11,8 @@ void first_run(char *name)
     char filename[50];
     FILE *fptr;
 
-    strcpy(filename, *name);
-    strcpy(filename, '.am');
+    strcpy(filename, name);
+    strcat(filename, ".am");
     fptr = fopen(filename, "r");
 
     if (!fptr) /*Check if there is any file with that name*/
@@ -23,18 +23,16 @@ void first_run(char *name)
 
     while (fgets(line, sizeof(line), fptr)) /*Loop over the file until getting EOF*/
     {
-        printf("\nRunnnnn\n");
         if (!is_empty(line) && !is_comment(line))
         {
             skipSpaces(line);
-            removeSpaces(line);
 
             if (line_cnt >= max_line)
             {
                 printf("File is too long\n");
                 exit(0);
             }
-            if (is_instruction(line))
+            if (is_extern_or_entry(line))
             {
             }
             else if (is_label(line))
@@ -44,7 +42,7 @@ void first_run(char *name)
                 cnt = get_label_name(line, label_name);
                 printf("\nfor the label: %s the char is: %c\n", label_name, line[cnt]);
             }
-            else if (is_extern_or_entry(line))
+            else if (is_instruction(line))
             {
             }
             else

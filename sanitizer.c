@@ -130,3 +130,66 @@ int get_label_name(const char *str, char *result)
     result[i] = '\0';
     return i;
 }
+
+/*Split instructions to the end of the file*/
+void split_instructions(const char *str)
+{
+    char line[100];
+    FILE *fptr, *temp_instruction_file, *temp_file;
+
+    fptr = fopen(str, "r+");
+    temp_instruction_file = fopen("temp_instruction_file.am", "w");
+    temp_file = fopen("temp_file.am", "w");
+
+    if (!fptr) /*Check if there was any failure for creating the file*/
+    {
+        fprintf(stderr, "Failed on create .am file due Memory allocation issue");
+        exit(0);
+    }
+
+    if (!temp_instruction_file) /*Check if there was any failure for creating the file*/
+    {
+        fprintf(stderr, "Failed on create .am file due Memory allocation issue");
+        exit(0);
+    }
+
+    if (!temp_file) /*Check if there was any failure for creating the file*/
+    {
+        fprintf(stderr, "Failed on create .am file due Memory allocation issue");
+        exit(0);
+    }
+
+    while (fgets(line, sizeof(line), fptr)) /*Loop over the file until getting EOF*/
+    {
+        if (!is_instruction(line))
+        {
+            fputs(line, temp_file);
+        }
+        else
+        {
+            fputs(line, temp_instruction_file);
+        }
+    }
+
+    fclose(fptr);
+    fclose(temp_instruction_file);
+    temp_instruction_file = fopen("temp_instruction_file.am", "r");
+
+    if (!temp_instruction_file) /*Check if there was any failure for creating the file*/
+    {
+        fprintf(stderr, "Failed on create .am file due Memory allocation issue");
+        exit(0);
+    }
+
+    while (fgets(line, sizeof(line), temp_instruction_file)) /*Loop over the file until getting EOF*/
+    {
+        fputs(line, temp_file);
+    }
+
+    fclose(temp_file);
+    fclose(temp_instruction_file);
+
+    remove(str);
+    remove("temp_instruction_file.am");
+    rename("temp_file.am", str);
+}

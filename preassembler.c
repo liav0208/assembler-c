@@ -40,6 +40,8 @@ void preassembler(FILE *fptr, char *filename)
     free(macros); /*Free the macros array memory*/
 
     fclose(amfptr);
+
+    split_instructions(amfname);
 }
 
 /*Get name, macro list and macro counter and check if the current name is a macro*/

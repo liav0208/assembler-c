@@ -32,17 +32,18 @@ void first_run(char *name)
                 printf("File is too long\n");
                 exit(0);
             }
-            if (is_extern_or_entry(line))
-            {
-            }
-            else if (is_label(line))
+            if (is_label(line))
             {
                 char label_name[20];
                 int cnt;
-                cnt = get_label_name(line, label_name);
-                printf("\nfor the label: %s the char is: %c\n", label_name, line[cnt]);
+                cnt = get_label_name(line, label_name); /*
+                 printf("\nfor the label: %s the char is: %c\n", label_name, line[cnt]);*/
             }
             else if (is_instruction(line))
+            {
+            }
+
+            else if (is_extern_or_entry(line))
             {
             }
             else

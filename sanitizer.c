@@ -137,29 +137,16 @@ void split_instructions(const char *str)
     char line[100];
     FILE *fptr, *temp_instruction_file, *temp_file;
 
+    /*Open the am file and two temp file for the split*/
     fptr = fopen(str, "r+");
     temp_instruction_file = fopen("temp_instruction_file.am", "w");
     temp_file = fopen("temp_file.am", "w");
 
-    if (!fptr) /*Check if there was any failure for creating the file*/
-    {
-        fprintf(stderr, "Failed on create .am file due Memory allocation issue");
-        exit(0);
-    }
+    CHECK_FILE(fptr);
+    CHECK_FILE(temp_instruction_file);
+    CHECK_FILE(temp_file);
 
-    if (!temp_instruction_file) /*Check if there was any failure for creating the file*/
-    {
-        fprintf(stderr, "Failed on create .am file due Memory allocation issue");
-        exit(0);
-    }
-
-    if (!temp_file) /*Check if there was any failure for creating the file*/
-    {
-        fprintf(stderr, "Failed on create .am file due Memory allocation issue");
-        exit(0);
-    }
-
-    while (fgets(line, sizeof(line), fptr)) /*Loop over the file until getting EOF*/
+    while (fgets(line, sizeof(line), fptr)) /*Loop over the file until getting EOF and put the line into the relevant temp file*/
     {
         if (!is_instruction(line))
         {
@@ -173,15 +160,13 @@ void split_instructions(const char *str)
 
     fclose(fptr);
     fclose(temp_instruction_file);
+
     temp_instruction_file = fopen("temp_instruction_file.am", "r");
 
-    if (!temp_instruction_file) /*Check if there was any failure for creating the file*/
-    {
-        fprintf(stderr, "Failed on create .am file due Memory allocation issue");
-        exit(0);
-    }
+    CHECK_FILE(temp_instruction_file);
 
-    while (fgets(line, sizeof(line), temp_instruction_file)) /*Loop over the file until getting EOF*/
+    /*Loop over the file until getting EOF and add instruction to the new file*/
+    while (fgets(line, sizeof(line), temp_instruction_file))
     {
         fputs(line, temp_file);
     }

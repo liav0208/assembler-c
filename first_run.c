@@ -15,11 +15,7 @@ void first_run(char *name)
     strcat(filename, ".am");
     fptr = fopen(filename, "r");
 
-    if (!fptr) /*Check if there is any file with that name*/
-    {
-        fprintf(stderr, "There is an issue with the file: %s", filename);
-        exit(0);
-    }
+    CHECK_FILE(fptr);
 
     while (fgets(line, sizeof(line), fptr)) /*Loop over the file until getting EOF*/
     {

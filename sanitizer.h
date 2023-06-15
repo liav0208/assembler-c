@@ -3,6 +3,13 @@
 #include <ctype.h>
 #include <stdlib.h>
 
+#define CHECK_FILE(file)                                                          \
+    if (!file)                                                                    \
+    {                                                                             \
+        fprintf(stderr, "Failed on create .am file due Memory allocation issue"); \
+        exit(0);                                                                  \
+    }
+
 int opcode(char ch[]);
 int is_empty(char *line);
 int is_comment(char *line);

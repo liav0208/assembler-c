@@ -25,11 +25,7 @@ void preassembler(FILE *fptr, char *filename)
     strcat(amfname, ".am");
     amfptr = fopen(amfname, "w"); /*Create new file for the .am file*/
 
-    if (!amfptr) /*Check if there was any failure for creating the file*/
-    {
-        fprintf(stderr, "Failed on create .am file due Memory allocation issue");
-        exit(0);
-    }
+    CHECK_FILE(amfptr);
 
     while (fgets(line, sizeof(line), fptr)) /*Loop over the file until getting EOF*/
     {

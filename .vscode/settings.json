@@ -2,6 +2,7 @@
   "C_Cpp.errorSquiggles": "disabled",
   "files.associations": {
     "sanitizer.h": "c",
-    "ctype.h": "c"
+    "ctype.h": "c",
+    "stdlib.h": "c"
   }
 }

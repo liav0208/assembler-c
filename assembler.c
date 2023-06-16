@@ -3,6 +3,10 @@
 #include <string.h>
 #include "preassembler.h"
 #include "first_run.h"
+#include "linked_lists.h"
+
+ee_ptr entries_h = NULL;
+ee_ptr extern_h = NULL;
 
 int main(int argc, char *argv[])
 {
@@ -28,7 +32,8 @@ int main(int argc, char *argv[])
 			exit(0);
 		}
 
-		preassembler(fptr, argv[i]); /*Use the preassmbler function and provide pointer to the file and the filename the use provided*/
+		/*Use the preassmbler function and provide pointer to the file and the filename the use provided*/
+		preassembler(fptr, argv[i]);
 		first_run(argv[1]);
 	}
 

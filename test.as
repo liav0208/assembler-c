@@ -1,3 +1,5 @@
+.entry LENGTH
+.extern W
 MAIN: mov @r3 ,LENGTH
 LOOP: jmp L1
 K: .data 22

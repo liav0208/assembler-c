@@ -18,4 +18,3 @@ int is_label(char *line);
 int legal_label(char label[]);
 int is_extern_or_entry(char *line);
 int get_label_name(const char *str, char *result);
-void split_instructions(const char *str);

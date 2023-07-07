@@ -58,3 +58,6 @@ typedef struct extern_entry
 void add_to_symbol_list(symbol_ptr *ptr, char name[], int location, int type);
 void add_to_linet_list(line_ptr *ptr, int data, int is_label, char label_name[]);
 void add_to_ee_list(ee_ptr *hptr, char name[], int line);
+void free_ee_list(ee_ptr *hptr);
+void free_line_list(line_ptr *hptr);
+void free_symbol_list(symbol_ptr *hptr);

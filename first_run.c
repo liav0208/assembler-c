@@ -1,6 +1,10 @@
 #include "first_run.h"
 #include "sanitizer.h"
 #include "utils.h"
+#include "linked_lists.h"
+
+extern ee_ptr entries_h;
+extern ee_ptr extern_h;
 
 void first_run(char *name)
 {
@@ -28,24 +32,23 @@ void first_run(char *name)
                 printf("File is too long\n");
                 exit(0);
             }
-            if (is_label(line))
-            {
-                char label_name[20];
-                int cnt;
-                cnt = get_label_name(line, label_name); /*
-                 printf("\nfor the label: %s the char is: %c\n", label_name, line[cnt]);*/
-            }
-            else if (is_instruction(line))
-            {
-            }
-
             else if (is_extern_or_entry(line))
             {
+                handle_extern_entry_line(line, line_cnt);
             }
             else
             {
+                if (is_label(line))
+                {
+                }
+                else if (is_instruction(line))
+                {
+                }
+                else
+                {
+                }
+                line_cnt++;
             }
-            line_cnt++;
         }
     }
 
@@ -53,4 +56,28 @@ void first_run(char *name)
     {
         exit(0);
     }
+}
+
+void handle_extern_entry_line(char line[], int line_cnt)
+{
+    char *token;
+
+    token = strtok(line, " ");
+
+    if (line[0] && line[strlen(line) - 1] == ':')
+    {
+        token = strtok(NULL, " ");
+    }
+
+    if (strcmp(token, ".entry"))
+    {
+        token = strtok(NULL, " ");
+        add_to_ee_list(&entries_h, token, line_cnt);
+    }
+    else if (strcmp(token, ".extern"))
+    {
+        token = strtok(NULL, " ");
+        add_to_ee_list(&extern_h, token, line_cnt);
+    }
+    printf("\ntoken is: %s\n", token);
 }

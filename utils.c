@@ -1,4 +1,5 @@
 #include "utils.h"
+#include "sanitizer.h"
 
 int strcmp_ignore_newline(const char *str1, const char *str2)
 {
@@ -44,4 +45,23 @@ void removeSpaces(char *str)
     }
 
     str[count] = '\0'; /* mark the end of str */
+}
+
+char *valid_extern_entry(const char *line)
+{
+    char linec[100];
+    char *token;
+
+    strcpy(linec, line);
+    skipSpaces(linec);
+
+    token = strtok(linec, " ");
+    if (strcmp(token, "entry") == 0)
+    {
+    }
+    else if (strcmp(token, "extern") == 0)
+    {
+    }
+
+    return NULL;
 }

@@ -94,11 +94,18 @@ int is_label(char *line)
 /*Check if the label name is valid*/
 int legal_label(char label[])
 {
-    if (label[0] >= 'A' && label[0] <= 'z' && strlen(label) < 31 && isalnum(label))
+    if (label[0] >= 'A' && label[0] <= 'z' && strlen(label) < 31 && isalnum(label) && opcode(label) == -1 && is_valid_register(label) == -1)
     {
         return 1;
     }
     return 0;
+}
+
+int is_valid_register(char registerName[])
+{
+    if (strcmp(registerName, "@r0") == 0 || strcmp(registerName, "@r1") == 0 || strcmp(registerName, "@r2") == 0 || strcmp(registerName, "@r3") == 0 || strcmp(registerName, "@r4") == 0 || strcmp(registerName, "@r5") == 0 || strcmp(registerName, "@r6") == 0 || strcmp(registerName, "@r7") == 0)
+        return 1;
+    return -1;
 }
 
 /*Check if the line is an Entry or Extern delacration*/
@@ -106,7 +113,7 @@ int is_extern_or_entry(char *line)
 {
     char *res;
 
-    res = strstr(line, ".enrty") ? strstr(line, ".enrty") : strstr(line, "entry");
+    res = strstr(line, ".entry") ? strstr(line, ".entry") : strstr(line, ".extern");
     if (!res)
         return 0;
     return 1;

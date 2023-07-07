@@ -1,8 +1,6 @@
 {
-  "C_Cpp.errorSquiggles": "disabled",
-  "files.associations": {
-    "sanitizer.h": "c",
-    "ctype.h": "c",
-    "stdlib.h": "c"
-  }
+    "C_Cpp.errorSquiggles": "disabled",
+    "files.associations": {
+        "linked_lists.h": "c"
+    }
 }

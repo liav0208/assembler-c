@@ -16,6 +16,18 @@ void add_to_symbol_list(symbol_ptr *hptr, char name[], int location, int type)
     INSERT_NODE(temp, p1);
 }
 
+void free_symbol_list(symbol_ptr *hptr)
+{
+    symbol_ptr p;
+
+    while (*hptr)
+    {
+        p = *hptr;
+        *hptr = (*hptr)->next;
+        free(p);
+    }
+}
+
 void add_to_linet_list(line_ptr *hptr, int data, int is_label, char label_name[])
 {
     line_ptr temp, p1;
@@ -32,6 +44,18 @@ void add_to_linet_list(line_ptr *hptr, int data, int is_label, char label_name[]
     INSERT_NODE(temp, p1);
 }
 
+void free_line_list(line_ptr *hptr)
+{
+    line_ptr p;
+
+    while (*hptr)
+    {
+        p = *hptr;
+        *hptr = (*hptr)->next;
+        free(p);
+    }
+}
+
 void add_to_ee_list(ee_ptr *hptr, char name[], int line)
 {
     ee_ptr temp, p1;
@@ -44,4 +68,16 @@ void add_to_ee_list(ee_ptr *hptr, char name[], int line)
 
     p1 = *hptr;
     INSERT_NODE(temp, p1);
+}
+
+void free_ee_list(ee_ptr *hptr)
+{
+    ee_ptr p;
+
+    while (*hptr)
+    {
+        p = *hptr;
+        *hptr = (*hptr)->next;
+        free(p);
+    }
 }

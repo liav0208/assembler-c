@@ -37,7 +37,7 @@ void preassembler(FILE *fptr, char *filename)
 
     fclose(amfptr);
 
-    split_instructions(amfname);
+    /*split_instructions(amfname);*/
 }
 
 /*Get name, macro list and macro counter and check if the current name is a macro*/

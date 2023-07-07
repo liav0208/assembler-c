@@ -137,3 +137,75 @@ int get_label_name(const char *str, char *result)
     result[i] = '\0';
     return i;
 }
+
+int get_opcode(const char opcode[])
+{
+    if (strcmp(opcode, "mov") == 0)
+    {
+        return 0;
+    }
+    else if (strcmp(opcode, "cmp") == 0)
+    {
+        return 1;
+    }
+    else if (strcmp(opcode, "add") == 0)
+    {
+        return 2;
+    }
+    else if (strcmp(opcode, "sub") == 0)
+    {
+        return 3;
+    }
+    else if (strcmp(opcode, "not") == 0)
+    {
+        return 4;
+    }
+    else if (strcmp(opcode, "clr") == 0)
+    {
+        return 5;
+    }
+    else if (strcmp(opcode, "lea") == 0)
+    {
+        return 6;
+    }
+    else if (strcmp(opcode, "inc") == 0)
+    {
+        return 7;
+    }
+    else if (strcmp(opcode, "dec") == 0)
+    {
+        return 8;
+    }
+    else if (strcmp(opcode, "jmp") == 0)
+    {
+        return 9;
+    }
+    else if (strcmp(opcode, "bne") == 0)
+    {
+        return 10;
+    }
+    else if (strcmp(opcode, "red") == 0)
+    {
+        return 11;
+    }
+    else if (strcmp(opcode, "prn") == 0)
+    {
+        return 12;
+    }
+    else if (strcmp(opcode, "jsr") == 0)
+    {
+        return 13;
+    }
+    else if (strcmp(opcode, "rts") == 0)
+    {
+        return 14;
+    }
+    else if (strcmp(opcode, "stop") == 0)
+    {
+        return 15;
+    }
+    else
+    {
+        return -1;
+    }
+}

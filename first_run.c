@@ -1,83 +1,39 @@
 #include "first_run.h"
 #include "sanitizer.h"
-#include "utils.h"
-#include "linked_lists.h"
 
-extern ee_ptr entries_h;
-extern ee_ptr extern_h;
-
-void first_run(char *name)
+int first_run(char *fname)
 {
-    int line_cnt = 100;
-    char line[100];
-    int max_line = 1024;
-    int has_error = 0;
-    char filename[50];
-    FILE *fptr;
+    char filename[50], line[100];
+    FILE *amfptr;
+    int DC = 0, IC = 0, is_symbol = 0, line_cnt = 100;
+    int is_err = 0;
 
-    strcpy(filename, name);
+    strcpy(filename, fname);
     strcat(filename, ".am");
-    fptr = fopen(filename, "r");
 
-    CHECK_FILE(fptr);
+    amfptr = fopen(filename, "r+"); /*Create new file for the .am file*/
 
-    while (fgets(line, sizeof(line), fptr)) /*Loop over the file until getting EOF*/
+    CHECK_FILE(amfptr);
+
+    while (fgets(line, sizeof(line), amfptr)) /*Loop over the file*/
     {
-        if (!is_empty(line) && !is_comment(line))
+        if (!is_comment(line) && !is_empty(line))
         {
-            skipSpaces(line);
-
-            if (line_cnt >= max_line)
+            if (is_label(line)) /*Check if line is label*/
             {
-                printf("File is too long\n");
-                exit(0);
+                is_symbol = 1;
             }
-            else if (is_extern_or_entry(line))
+            if (is_instruction(line)) /*Check if instruction*/
             {
-                handle_extern_entry_line(line, line_cnt);
             }
-            else
+            else if (is_extern_or_entry(line)) /*Check if entry or extern*/
             {
-                if (is_label(line))
-                {
-                }
-                else if (is_instruction(line))
-                {
-                }
-                else
-                {
-                }
-                line_cnt++;
             }
         }
+
+        is_symbol = 0;
+        line_cnt++;
     }
 
-    if (has_error == 1)
-    {
-        exit(0);
-    }
-}
-
-void handle_extern_entry_line(char line[], int line_cnt)
-{
-    char *token;
-
-    token = strtok(line, " ");
-
-    if (line[0] && line[strlen(line) - 1] == ':')
-    {
-        token = strtok(NULL, " ");
-    }
-
-    if (strcmp(token, ".entry"))
-    {
-        token = strtok(NULL, " ");
-        add_to_ee_list(&entries_h, token, line_cnt);
-    }
-    else if (strcmp(token, ".extern"))
-    {
-        token = strtok(NULL, " ");
-        add_to_ee_list(&extern_h, token, line_cnt);
-    }
-    printf("\ntoken is: %s\n", token);
+    return 0;
 }

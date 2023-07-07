@@ -1,5 +1,3 @@
-#include <stdio.h>
-#include <stdlib.h>
+#include <string.h>
 
-void first_run(char *name);
-void handle_extern_entry_line(char line[], int line_cnt);
+int first_run(char *filename);

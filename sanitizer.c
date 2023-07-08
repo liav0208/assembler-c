@@ -62,7 +62,7 @@ int is_comment(char *line)
 }
 
 /*Check if this is an Instruction line*/
-int is_instruction(char *line)
+int is_data(char *line)
 {
     char *res;
 
@@ -120,22 +120,25 @@ int is_extern_or_entry(char *line)
 }
 
 /*Get the label name*/
-int get_label_name(const char *str, char *result)
+char *get_label_name(const char *str)
 {
     int i = 0;
-
-    while (str[i] != '\0')
+    while (str[i] != '\0' && str[i] != ':')
     {
-        if (str[i] == ':')
-        {
-            break;
-        }
-        result[i] = str[i];
         i++;
     }
 
-    result[i] = '\0';
-    return i;
+    char *word = (char *)malloc((i + 1) * sizeof(char));
+    if (word == NULL)
+    {
+        /*Error handling if memory allocation fails*/
+        printf("Memory allocation failed.\n");
+        return NULL;
+    }
+
+    strncpy(word, str, i);
+    word[i] = '\0';
+    return word;
 }
 
 int get_opcode(const char opcode[])

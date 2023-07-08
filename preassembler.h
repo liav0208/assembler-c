@@ -27,4 +27,3 @@ typedef struct macro
 void preassembler(FILE *fptr, char *filename);
 int is_macro(char name[20], int macroCnt, Macro *macros);
 void handle_line(char *line, Macro *macros, int *cnt, int *size, int *ismacro, FILE *fptr);
-void split_instructions(const char *str);

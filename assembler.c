@@ -3,6 +3,7 @@
 #include <string.h>
 #include "preassembler.h"
 #include "first_run.h"
+#include "data_structures.h"
 
 int main(int argc, char *argv[])
 {
@@ -17,6 +18,9 @@ int main(int argc, char *argv[])
 	for (i = 1; i < argc; i++) /*Run over each filename the user provide*/
 	{
 		char filename[50];
+		TwelveBits instruction_arr[FILE_LIMIT_MEMO];
+		TwelveBits data_arr[FILE_LIMIT_MEMO];
+		ptr head = NULL;
 
 		strcpy(filename, argv[i]);
 		strcat(filename, ".as");
@@ -31,7 +35,8 @@ int main(int argc, char *argv[])
 		/*Use the preassmbler function and provide pointer to the file and the filename the use provided*/
 		preassembler(fptr, argv[i]);
 
-		first_run(argv[i]);
+		first_run(argv[i], &head);
+		printList(head);
 	}
 
 	fclose(fptr); /*Close the file*/

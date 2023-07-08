@@ -36,8 +36,6 @@ void preassembler(FILE *fptr, char *filename)
     free(macros); /*Free the macros array memory*/
 
     fclose(amfptr);
-
-    /*split_instructions(amfname);*/
 }
 
 /*Get name, macro list and macro counter and check if the current name is a macro*/
@@ -91,52 +89,4 @@ void handle_line(char *line, Macro *macros, int *cnt, int *size, int *ismacro, F
     {
         fputs(line, fptr);
     }
-}
-
-/*Split instructions to the end of the file*/
-void split_instructions(const char *str)
-{
-    char line[100];
-    FILE *fptr, *temp_instruction_file, *temp_file;
-
-    /*Open the am file and two temp file for the split*/
-    fptr = fopen(str, "r+");
-    temp_instruction_file = fopen("temp_instruction_file.am", "w");
-    temp_file = fopen("temp_file.am", "w");
-
-    CHECK_FILE(fptr);
-    CHECK_FILE(temp_instruction_file);
-    CHECK_FILE(temp_file);
-
-    while (fgets(line, sizeof(line), fptr)) /*Loop over the file until getting EOF and put the line into the relevant temp file*/
-    {
-        if (!is_instruction(line))
-        {
-            fputs(line, temp_file);
-        }
-        else
-        {
-            fputs(line, temp_instruction_file);
-        }
-    }
-
-    fclose(fptr);
-    fclose(temp_instruction_file);
-
-    temp_instruction_file = fopen("temp_instruction_file.am", "r");
-
-    CHECK_FILE(temp_instruction_file);
-
-    /*Loop over the file until getting EOF and add instruction to the new file*/
-    while (fgets(line, sizeof(line), temp_instruction_file))
-    {
-        fputs(line, temp_file);
-    }
-
-    fclose(temp_file);
-    fclose(temp_instruction_file);
-
-    remove(str);
-    remove("temp_instruction_file.am");
-    rename("temp_file.am", str);
 }

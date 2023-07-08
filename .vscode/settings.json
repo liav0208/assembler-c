@@ -1,6 +1,7 @@
 {
-    "C_Cpp.errorSquiggles": "disabled",
-    "files.associations": {
-        "linked_lists.h": "c"
-    }
+  "C_Cpp.errorSquiggles": "disabled",
+  "files.associations": {
+    "linked_lists.h": "c",
+    "data_structures.h": "c"
+  }
 }

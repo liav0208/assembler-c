@@ -1,12 +1,14 @@
 #include "first_run.h"
 #include "sanitizer.h"
+#include "data_structures.h"
 
-int first_run(char *fname)
+int first_run(char *fname, ptr *head)
 {
     char filename[50], line[100];
     FILE *amfptr;
     int DC = 0, IC = 0, is_symbol = 0, line_cnt = 100;
     int is_err = 0;
+    char *first_word, *label;
 
     strcpy(filename, fname);
     strcat(filename, ".am");
@@ -23,8 +25,13 @@ int first_run(char *fname)
             {
                 is_symbol = 1;
             }
-            if (is_instruction(line)) /*Check if instruction*/
+            if (is_data(line)) /*Check if data declaration*/
             {
+                if (is_symbol)
+                {
+                    label = get_label_name(&line);
+                    insertNode(head, label, line_cnt);
+                }
             }
             else if (is_extern_or_entry(line)) /*Check if entry or extern*/
             {

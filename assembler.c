@@ -18,8 +18,8 @@ int main(int argc, char *argv[])
 	for (i = 1; i < argc; i++) /*Run over each filename the user provide*/
 	{
 		char filename[50];
-		TwelveBits instruction_arr[FILE_LIMIT_MEMO];
-		TwelveBits data_arr[FILE_LIMIT_MEMO];
+		TwelveBitsStruct instruction_arr[FILE_LIMIT_MEMO];
+		TwelveBitsStruct data_arr[FILE_LIMIT_MEMO];
 		ptr head = NULL;
 
 		strcpy(filename, argv[i]);
@@ -35,7 +35,7 @@ int main(int argc, char *argv[])
 		/*Use the preassmbler function and provide pointer to the file and the filename the use provided*/
 		preassembler(fptr, argv[i]);
 
-		first_run(argv[i], &head);
+		first_run(argv[i], &head, instruction_arr, data_arr);
 		printList(head);
 	}
 

@@ -25,3 +25,6 @@ int is_extern_or_entry(char *line);
 char *get_label_name(const char *str);
 int is_valid_register(char register[]);
 int get_opcode(const char opcode[]);
+int is_valid_number(char str[]);
+int find_addressing_mode(char str[]);
+void remove_new_line(char *str);

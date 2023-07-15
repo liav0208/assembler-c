@@ -7,16 +7,16 @@ mcro m1
 sub @r1, @r4
 bne END
 endmcro
-STR: .string “abcdef”
+STR: .string "abcdef"
 
 
 ; test
 prn -5
 bne LOOP
 LABEL: .extern Another
-.string “test”
+.string "test"
 m1
 L1: inc K
 bne LOOP
 END: stop
-LENGTH: .data 6,-9,15
+LENGTH: .data 6,-9 ,15

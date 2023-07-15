@@ -9,7 +9,7 @@ ptr createNode(const char label[], unsigned int row)
         printf("Memory allocation failed.\n");
         return NULL;
     }
-    strncpy(newNode->label, label, sizeof(newNode->label) - 1);
+    strcpy(newNode->label, label);
     newNode->row = row;
     newNode->next = NULL;
     return newNode;
@@ -19,6 +19,7 @@ ptr createNode(const char label[], unsigned int row)
 void insertNode(ptr *head, const char label[], unsigned int row)
 {
     ptr newNode = createNode(label, row);
+
     if (newNode == NULL)
     {
         return; /*Error handling*/
@@ -36,6 +37,21 @@ void printList(ptr head)
         printf("Label: %s, Row: %u\n", current->label, current->row);
         current = current->next;
     }
+}
+
+/*Function to check if a label already exists in the list*/
+int labelExists(ptr head, const char label[])
+{
+    ptr current = head;
+    while (current != NULL)
+    {
+        if (strcmp(current->label, label) == 0)
+        {
+            return 1; /*Label already exists*/
+        }
+        current = current->next;
+    }
+    return 0; /*Label does not exist*/
 }
 
 /*Function to free the memory allocated for the linked list*/

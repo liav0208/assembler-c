@@ -23,8 +23,6 @@ typedef struct
     unsigned int bits : 12;
 } TwelveBitsStruct;
 
-typedef TwelveBitsStruct TwelveBits;
-
 typedef struct node *ptr;
 typedef struct node
 {
@@ -36,6 +34,7 @@ typedef struct node
 ptr createNode(const char label[], unsigned int row);
 void insertNode(ptr *head, const char label[], unsigned int row);
 void printList(ptr head);
+int labelExists(ptr head, const char label[]);
 void freeList(ptr head);
 
 #endif /* DATA_STRUCTURES_H */

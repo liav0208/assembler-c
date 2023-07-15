@@ -94,7 +94,7 @@ int is_label(char *line)
 /*Check if the label name is valid*/
 int legal_label(char label[])
 {
-    if (label[0] >= 'A' && label[0] <= 'z' && strlen(label) < 31 && isalnum(label) && opcode(label) == -1 && is_valid_register(label) == -1)
+    if (label[0] >= 'A' && label[0] <= 'z' && strlen(label) < 31 && isalnum(label) && opcode(label) == -1 && is_valid_register(label) == 0)
     {
         return 1;
     }
@@ -105,7 +105,7 @@ int is_valid_register(char registerName[])
 {
     if (strcmp(registerName, "@r0") == 0 || strcmp(registerName, "@r1") == 0 || strcmp(registerName, "@r2") == 0 || strcmp(registerName, "@r3") == 0 || strcmp(registerName, "@r4") == 0 || strcmp(registerName, "@r5") == 0 || strcmp(registerName, "@r6") == 0 || strcmp(registerName, "@r7") == 0)
         return 1;
-    return -1;
+    return 0;
 }
 
 /*Check if the line is an Entry or Extern delacration*/
@@ -123,12 +123,13 @@ int is_extern_or_entry(char *line)
 char *get_label_name(const char *str)
 {
     int i = 0;
+    char *word;
     while (str[i] != '\0' && str[i] != ':')
     {
         i++;
     }
 
-    char *word = (char *)malloc((i + 1) * sizeof(char));
+    word = (char *)malloc((i + 1) * sizeof(char));
     if (word == NULL)
     {
         /*Error handling if memory allocation fails*/
@@ -139,6 +140,26 @@ char *get_label_name(const char *str)
     strncpy(word, str, i);
     word[i] = '\0';
     return word;
+}
+
+int is_valid_number(char str[])
+{
+    int i;
+
+    for (i = 0; i < strlen(str); i++)
+    {
+        if (i == 0)
+        {
+            if (str[i] != '-' && !isdigit(str[i]))
+                return 0;
+        }
+        else if (!isdigit(str[i]))
+        {
+            return 0;
+        }
+    }
+
+    return 1;
 }
 
 int get_opcode(const char opcode[])
@@ -211,4 +232,37 @@ int get_opcode(const char opcode[])
     {
         return -1;
     }
+}
+
+int find_addressing_mode(char str[])
+{
+    if (is_valid_register(str))
+    {
+        return 5;
+    }
+    else if (legal_label(str))
+    {
+        return 3;
+    }
+    else if (is_valid_number(str))
+    {
+        return 1;
+    }
+    else
+    {
+        return 0;
+    }
+}
+
+void remove_new_line(char *str)
+{
+    int i, count = 0;
+
+    for (i = 0; i < strlen(str); i++)
+    {
+        if (str[i] != '\n')
+            str[count++] = str[i];
+    }
+
+    str[count] = '\0'; /* mark the end of str */
 }

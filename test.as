@@ -13,7 +13,6 @@ STR: .string "abcdef"
 ; test
 prn -5
 bne LOOP
-LABEL: .extern Another
 .string "test"
 m1
 L1: inc K

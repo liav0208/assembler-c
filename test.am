@@ -6,7 +6,6 @@ K: .data 22
 STR: .string "abcdef"
 prn -5
 bne LOOP
-LABEL: .extern Another
 .string "test"
 sub @r1, @r4
 bne END

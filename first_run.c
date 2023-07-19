@@ -27,7 +27,7 @@ int first_run(char *fname, ptr *head, TwelveBitsStruct *instruction_arr, TwelveB
             if (is_label(line)) /*Check if line is label*/
             {
                 label = get_label_name(line);
-                if (labelExists(*head, label))
+                if (labelExists(*head, label)) /*Check if the symbol already exist*/
                 {
                     is_err = 1;
                     fprintf(stderr, "line %d: label %s already exist\n", line_cnt, label);
@@ -54,42 +54,42 @@ int first_run(char *fname, ptr *head, TwelveBitsStruct *instruction_arr, TwelveB
             {
                 char *cmd, *symbol;
 
+                /*Get the cmd and symbol from the line*/
                 cmd = strtok(line, " \t\n");
                 symbol = strtok(NULL, " \t\n");
+                printf("cmd is: %s and symbol is: %s\n", cmd, symbol);
 
-                if (!legal_label(symbol))
+                if (!legal_label(symbol)) /*Check if the symbol already exist*/
                 {
                     is_err = 1;
-                    fprintf(stderr, "line %d: label %s is illegal\n", line_cnt, label);
+                    fprintf(stderr, "line %d: label %s is illegal\n", line_cnt, symbol);
                 }
                 else
                 {
-                    /*if (strcmp(cmd, ".entry") == 0)
+                    if (strcmp(cmd, ".entry") == 0) /*In case the CMD is .entry*/
                     {
-
-                        if (labelExistsInList(*entries_head, label))
+                        if (labelExistsInList(*entries_head, symbol)) /*Check if the symbol already exist*/
                         {
                             is_err = 1;
-                            fprintf(stderr, "line %d: label %s is illegal\n", line_cnt, label);
+                            fprintf(stderr, "line %d: label %s is illegal\n", line_cnt, symbol);
                         }
                         else
                         {
-                            insertListNode(entries_head, label);
+                            insertListNode(entries_head, symbol);
                         }
                     }
-                    else
+                    else /*In case the CMD is .extern*/
                     {
-                        if (labelExistsInList(*extern_head, label))
+                        if (labelExistsInList(*extern_head, symbol)) /*Check if the symbol already exist*/
                         {
                             is_err = 1;
-                            fprintf(stderr, "line %d: label %s is illegal\n", line_cnt, label);
+                            fprintf(stderr, "line %d: label %s is illegal\n", line_cnt, symbol);
                         }
                         else
                         {
-                            insertListNode(extern_head, label);
+                            insertListNode(extern_head, symbol);
                         }
                     }
-                    */
                 }
             }
             else /*This line is instruction*/

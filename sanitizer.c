@@ -94,7 +94,7 @@ int is_label(char *line)
 /*Check if the label name is valid*/
 int legal_label(char label[])
 {
-    if (label[0] >= 'A' && label[0] <= 'z' && strlen(label) < 31 && isalnum(label) && opcode(label) == -1 && is_valid_register(label) == 0)
+    if (label[0] >= 'A' && label[0] <= 'z' && strlen(label) < 31 && opcode(label) == -1 && is_valid_register(label) == 0)
     {
         return 1;
     }

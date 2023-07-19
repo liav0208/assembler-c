@@ -15,6 +15,17 @@
         exit(0);                                                                  \
     }
 
+#define SAVE_PARAM(param)                                      \
+    {                                                          \
+        param = strtok(NULL, " ,\t\n");                        \
+                                                               \
+        if (!param)                                            \
+        {                                                      \
+            fprintf(stderr, "Invalid amount of parameters\n"); \
+            return 0;                                          \
+        }                                                      \
+    }
+
 int opcode(char ch[]);
 int is_empty(char *line);
 int is_comment(char *line);
@@ -28,3 +39,5 @@ int get_opcode(const char opcode[]);
 int is_valid_number(char str[]);
 int find_addressing_mode(char str[]);
 void remove_new_line(char *str);
+int is_valid_int(char *num);
+int is_valid_string(char *str);

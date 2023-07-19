@@ -9,15 +9,6 @@
 #define SIZE 5
 #define FILE_LIMIT_MEMO 1000
 
-#define VALIDATE_DYNAMIC_ARR(arr)                       \
-    {                                                   \
-        if (arr == NULL)                                \
-        {                                               \
-            fprintf(stderr, "Failed on Dynamic array"); \
-            exit(0);                                    \
-        }                                               \
-    }
-
 typedef struct
 {
     unsigned int bits : 12;
@@ -31,10 +22,22 @@ typedef struct node
     ptr next;
 } SignTableRow;
 
+typedef struct list *list_ptr;
+typedef struct list
+{
+    char label[50];
+    list_ptr next;
+} List;
+
 ptr createNode(const char label[], unsigned int row);
 void insertNode(ptr *head, const char label[], unsigned int row);
 void printList(ptr head);
 int labelExists(ptr head, const char label[]);
 void freeList(ptr head);
+list_ptr createListNode(const char label[]);
+void insertListNode(list_ptr *head, const char label[]);
+void printList_2(list_ptr head);
+int labelExistsInList(list_ptr head, const char label[]);
+void freeList2(list_ptr head);
 
 #endif /* DATA_STRUCTURES_H */

@@ -22,6 +22,9 @@ int main(int argc, char *argv[])
 		TwelveBitsStruct data_arr[FILE_LIMIT_MEMO];
 		ptr head = NULL;
 
+		list_ptr entries_head = NULL;
+		list_ptr extern_head = NULL;
+
 		strcpy(filename, argv[i]);
 		strcat(filename, ".as");
 		fptr = fopen(filename, "r");
@@ -35,8 +38,12 @@ int main(int argc, char *argv[])
 		/*Use the preassmbler function and provide pointer to the file and the filename the use provided*/
 		preassembler(fptr, argv[i]);
 
-		first_run(argv[i], &head, instruction_arr, data_arr);
+		first_run(argv[i], &head, instruction_arr, data_arr, &entries_head, &extern_head);
 		printList(head);
+		printf("\n------------------\n");
+		printList_2(entries_head);
+		printf("\n------------------\n");
+		printList_2(extern_head);
 	}
 
 	fclose(fptr); /*Close the file*/

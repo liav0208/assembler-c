@@ -65,3 +65,68 @@ void freeList(ptr head)
         free(temp);
     }
 }
+
+/*Function to create a new node*/
+list_ptr createListNode(const char label[])
+{
+    list_ptr newListNode = (list_ptr)malloc(sizeof(struct list));
+    if (newListNode == NULL)
+    {
+        printf("Memory allocation failed.\n");
+        return NULL;
+    }
+    strcpy(newListNode->label, label);
+    newListNode->next = NULL;
+    return newListNode;
+}
+
+/*Function to insert a node at the beginning of the list*/
+void insertListNode(list_ptr *head, const char label[])
+{
+    list_ptr newListNode = createListNode(label);
+
+    if (newListNode == NULL)
+    {
+        return; /*Error handling*/
+    }
+    newListNode->next = *head;
+    *head = newListNode;
+}
+
+/*Function to print the linked list*/
+void printList_2(list_ptr head)
+{
+    list_ptr current = head;
+    while (current != NULL)
+    {
+        printf("Label: %s\n", current->label);
+        current = current->next;
+    }
+}
+
+/*Function to check if a label already exists in the list*/
+int labelExistsInList(list_ptr head, const char label[])
+{
+    list_ptr current = head;
+    while (current != NULL)
+    {
+        if (strcmp(current->label, label) == 0)
+        {
+            return 1; /*Label already exists*/
+        }
+        current = current->next;
+    }
+    return 0; /*Label does not exist*/
+}
+
+/*Function to free the memory allocated for the linked list*/
+void freeList2(list_ptr head)
+{
+    list_ptr current = head;
+    while (current != NULL)
+    {
+        list_ptr temp = current;
+        current = current->next;
+        free(temp);
+    }
+}

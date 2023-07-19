@@ -3,14 +3,13 @@
 #include "utils.h"
 #include "data_structures.h"
 
-int first_run(char *fname, ptr *head, TwelveBitsStruct *instruction_arr, TwelveBitsStruct *data_arr)
+int first_run(char *fname, ptr *head, TwelveBitsStruct *instruction_arr, TwelveBitsStruct *data_arr, list_ptr *entries_head, list_ptr *extern_head)
 {
     char filename[50], line[100];
     FILE *amfptr;
     int DC = 0, IC = 0, line_cnt = 0, memory_place = 100;
     int is_err = 0;
     char *label;
-    int i;
 
     strcpy(filename, fname);
     strcat(filename, ".am");
@@ -21,8 +20,10 @@ int first_run(char *fname, ptr *head, TwelveBitsStruct *instruction_arr, TwelveB
 
     while (fgets(line, sizeof(line), amfptr)) /*Loop over the file*/
     {
+
         if (!is_comment(line) && !is_empty(line))
         {
+
             if (is_label(line)) /*Check if line is label*/
             {
                 label = get_label_name(line);
@@ -30,6 +31,11 @@ int first_run(char *fname, ptr *head, TwelveBitsStruct *instruction_arr, TwelveB
                 {
                     is_err = 1;
                     fprintf(stderr, "line %d: label %s already exist\n", line_cnt, label);
+                }
+                else if (!legal_label(label))
+                {
+                    is_err = 1;
+                    fprintf(stderr, "line %d: label %s is illegal\n", line_cnt, label);
                 }
                 else
                 {
@@ -46,21 +52,60 @@ int first_run(char *fname, ptr *head, TwelveBitsStruct *instruction_arr, TwelveB
             }
             else if (is_extern_or_entry(line)) /*Check if entry or extern*/
             {
+                char *cmd, *symbol;
+
+                cmd = strtok(line, " \t\n");
+                symbol = strtok(NULL, " \t\n");
+
+                if (!legal_label(symbol))
+                {
+                    is_err = 1;
+                    fprintf(stderr, "line %d: label %s is illegal\n", line_cnt, label);
+                }
+                else
+                {
+                    /*if (strcmp(cmd, ".entry") == 0)
+                    {
+
+                        if (labelExistsInList(*entries_head, label))
+                        {
+                            is_err = 1;
+                            fprintf(stderr, "line %d: label %s is illegal\n", line_cnt, label);
+                        }
+                        else
+                        {
+                            insertListNode(entries_head, label);
+                        }
+                    }
+                    else
+                    {
+                        if (labelExistsInList(*extern_head, label))
+                        {
+                            is_err = 1;
+                            fprintf(stderr, "line %d: label %s is illegal\n", line_cnt, label);
+                        }
+                        else
+                        {
+                            insertListNode(extern_head, label);
+                        }
+                    }
+                    */
+                }
             }
             else /*This line is instruction*/
             {
-                if (!validate_save_instuction(line, instruction_arr, &IC))
+                /*if (!validate_save_instuction(line, instruction_arr, &IC))
                 {
                     is_err = 1;
                     fprintf(stderr, "line %d: Invalid Instruction command\n", line_cnt);
-                }
+                }*/
             }
         }
 
         line_cnt++;
     }
 
-    for (i = 0; i < DC; i++)
+    /*for (i = 0; i < DC; i++)
     {
         printf("\nin data_arr line %d is %d\n", i, data_arr[i].bits);
     }
@@ -68,7 +113,7 @@ int first_run(char *fname, ptr *head, TwelveBitsStruct *instruction_arr, TwelveB
     for (i = 0; i < IC; i++)
     {
         printf("\nin instruction_arr line %d is %d\n", i, instruction_arr[i].bits);
-    }
+    }*/
 
     return is_err;
 }
@@ -155,8 +200,11 @@ int validate_save_data_line(char line[], TwelveBitsStruct *array, int *cnt)
 int validate_save_instuction(char line[], TwelveBitsStruct *array, int *cnt)
 {
     char *token;
-    int opcode, temp_bits = 0;
+    int opcode, temp_bits = 0, param1_method, param2_method;
+    char *param1, *param2;
+
     TwelveBitsStruct line_bits;
+    temp_bits = 0;
 
     token = strtok(line, " \t");
 
@@ -174,19 +222,63 @@ int validate_save_instuction(char line[], TwelveBitsStruct *array, int *cnt)
         return 0;
     }
 
-    if (opcode == 14 || opcode == 15)
+    SAVE_PARAM(param1);
+    SAVE_PARAM(param2);
+
+    if (opcode == 0 || opcode == 2 || opcode == 3) /*for 'mov', 'add' and 'sub'*/
     {
-        temp_bits = 0;
+
+        temp_bits += opcode << 5;
+
+        if (param1[0] == '@')
+        {
+            if (is_valid_register(param1))
+            {
+                temp_bits += 5 << 9;
+            }
+            else
+            {
+                fprintf(stderr, "%s is invalid register\n", param1);
+            }
+        }
+
+        if (param2[0] == '@')
+        {
+            if (is_valid_register(param2))
+            {
+                temp_bits += 5 << 2;
+            }
+            else
+            {
+                fprintf(stderr, "%s is invalid register\n", param2);
+            }
+        }
+
+        printf("\nParam 1 is: %s Param 2 is: %s\n", param1, param2);
+    }
+    else if (opcode == 1) /*for 'cmp'*/
+    {
+        char *param1, *param2;
+        SAVE_PARAM(param1);
+        SAVE_PARAM(param2);
+    }
+    else if (opcode == 6) /*for 'lea'*/
+    {
+        char *param1, *param2;
+        SAVE_PARAM(param1);
+        SAVE_PARAM(param2);
+    }
+    else if (opcode == 4 || opcode == 5 || opcode == 7 || opcode == 8 || opcode == 9 || opcode == 10 || opcode == 11 || opcode == 13) /*for 'not', 'clr', 'inc', 'dec', 'jmp', 'bne', 'red', 'jsr'*/
+    {
+    }
+    else if (opcode == 12) /*for 'prn'*/
+    {
+    }
+    else /*for 'rts' and 'mov'*/
+    {
         temp_bits += (opcode << 5);
         array[*cnt].bits = temp_bits;
         (*cnt)++;
-    }
-    else
-    {
-        char *params;
-
-        params = strtok(NULL, "\n");
-        printf("\nParams are: %s\n", params);
     }
 
     /*Check that what left of the line is ok*/

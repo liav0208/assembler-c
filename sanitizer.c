@@ -266,3 +266,40 @@ void remove_new_line(char *str)
 
     str[count] = '\0'; /* mark the end of str */
 }
+
+/*Check if string is valid integer*/
+int is_valid_int(char *num)
+{
+    int i;
+
+    if (num[0] != '+' || num[0] != '-' || !isdigit(num[0]))
+    {
+        return 0;
+    }
+
+    for (i = 1; i < strlen(num); i++)
+    {
+        if (!isdigit(num[i]))
+            return 0;
+    }
+
+    return 1;
+}
+
+/*Check if string is valid string*/
+int is_valid_string(char *str)
+{
+    int i;
+
+    if (str[0] != '"' || str[strlen(str) - 1] != '"')
+    {
+        return 0;
+    }
+
+    for (i = 1; i < strlen(str) - 1; i++)
+    {
+        if (!isalpha(str[i]) && !isspace(str[i]))
+            return 0;
+    }
+    return 1;
+}

@@ -41,3 +41,5 @@ int find_addressing_mode(char str[]);
 void remove_new_line(char *str);
 int is_valid_int(char *num);
 int is_valid_string(char *str);
+int is_alnum_string(char *str);
+int check_addressing_method(char *str);

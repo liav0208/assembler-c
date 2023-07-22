@@ -23,7 +23,6 @@ int first_run(char *fname, ptr *head, TwelveBitsStruct *instruction_arr, TwelveB
 
         if (!is_comment(line) && !is_empty(line))
         {
-
             if (is_label(line)) /*Check if line is label*/
             {
                 label = get_label_name(line);
@@ -57,7 +56,6 @@ int first_run(char *fname, ptr *head, TwelveBitsStruct *instruction_arr, TwelveB
                 /*Get the cmd and symbol from the line*/
                 cmd = strtok(line, " \t\n");
                 symbol = strtok(NULL, " \t\n");
-                printf("cmd is: %s and symbol is: %s\n", cmd, symbol);
 
                 if (!legal_label(symbol)) /*Check if the symbol already exist*/
                 {
@@ -94,26 +92,16 @@ int first_run(char *fname, ptr *head, TwelveBitsStruct *instruction_arr, TwelveB
             }
             else /*This line is instruction*/
             {
-                /*if (!validate_save_instuction(line, instruction_arr, &IC))
+                if (!validate_save_instuction(line, instruction_arr, &IC, head, extern_head))
                 {
                     is_err = 1;
                     fprintf(stderr, "line %d: Invalid Instruction command\n", line_cnt);
-                }*/
+                }
             }
         }
 
         line_cnt++;
     }
-
-    /*for (i = 0; i < DC; i++)
-    {
-        printf("\nin data_arr line %d is %d\n", i, data_arr[i].bits);
-    }
-
-    for (i = 0; i < IC; i++)
-    {
-        printf("\nin instruction_arr line %d is %d\n", i, instruction_arr[i].bits);
-    }*/
 
     return is_err;
 }
@@ -147,7 +135,7 @@ int validate_save_data_line(char line[], TwelveBitsStruct *array, int *cnt)
 
         if (definition[0] != '"' || definition[strlen(definition) - 1] != '"') /*Check if the string data is not valid*/
         {
-            printf("Invalid .string definition");
+            printf("Invalid .string definition\n");
             return 0;
         }
         while (definition[i] != '\"') /*Loop over the string and save each character into the array*/
@@ -197,17 +185,14 @@ int validate_save_data_line(char line[], TwelveBitsStruct *array, int *cnt)
     return 1;
 }
 
-int validate_save_instuction(char line[], TwelveBitsStruct *array, int *cnt)
+int validate_save_instuction(char line[], TwelveBitsStruct *array, int *cnt, ptr *head, list_ptr *extern_arr)
 {
     char *token;
-    int opcode, temp_bits = 0, param1_method, param2_method;
-    char *param1, *param2;
-
-    TwelveBitsStruct line_bits;
-    temp_bits = 0;
+    int opcode, temp_bits = 0;
 
     token = strtok(line, " \t");
 
+    /*Check if the first word is label definition*/
     if (token[strlen(token) - 1] == ':')
     {
         token = strtok(NULL, " \t");
@@ -216,70 +201,188 @@ int validate_save_instuction(char line[], TwelveBitsStruct *array, int *cnt)
     remove_new_line(token);
     opcode = get_opcode(token);
 
+    /*Check if opcode is valid*/
     if (opcode == -1)
     {
         fprintf(stderr, "\nOpcode %s is not valid\n", token);
         return 0;
     }
 
-    SAVE_PARAM(param1);
-    SAVE_PARAM(param2);
+    temp_bits += (opcode << 5);
 
-    if (opcode == 0 || opcode == 2 || opcode == 3) /*for 'mov', 'add' and 'sub'*/
+    if (opcode == 14 || opcode == 15) /*Check if 'rts' or 'stop'*/
     {
-
-        temp_bits += opcode << 5;
-
-        if (param1[0] == '@')
-        {
-            if (is_valid_register(param1))
-            {
-                temp_bits += 5 << 9;
-            }
-            else
-            {
-                fprintf(stderr, "%s is invalid register\n", param1);
-            }
-        }
-
-        if (param2[0] == '@')
-        {
-            if (is_valid_register(param2))
-            {
-                temp_bits += 5 << 2;
-            }
-            else
-            {
-                fprintf(stderr, "%s is invalid register\n", param2);
-            }
-        }
-
-        printf("\nParam 1 is: %s Param 2 is: %s\n", param1, param2);
-    }
-    else if (opcode == 1) /*for 'cmp'*/
-    {
-        char *param1, *param2;
-        SAVE_PARAM(param1);
-        SAVE_PARAM(param2);
-    }
-    else if (opcode == 6) /*for 'lea'*/
-    {
-        char *param1, *param2;
-        SAVE_PARAM(param1);
-        SAVE_PARAM(param2);
-    }
-    else if (opcode == 4 || opcode == 5 || opcode == 7 || opcode == 8 || opcode == 9 || opcode == 10 || opcode == 11 || opcode == 13) /*for 'not', 'clr', 'inc', 'dec', 'jmp', 'bne', 'red', 'jsr'*/
-    {
-    }
-    else if (opcode == 12) /*for 'prn'*/
-    {
-    }
-    else /*for 'rts' and 'mov'*/
-    {
-        temp_bits += (opcode << 5);
         array[*cnt].bits = temp_bits;
+        (*cnt)++;
+
+        token = strtok(NULL, "");
+
+        /*Validated the the line not contain any more characters*/
+        CHECK_END_OF_LINE(token);
+    }
+
+    if (opcode == 4 || opcode == 5 || opcode == 7 || opcode == 8 || opcode == 9 || opcode == 10 || opcode == 11 || opcode == 13 || opcode == 12)
+    {
+        return handle_one_operand(token, array, cnt, opcode, temp_bits);
+    }
+
+    if (opcode == 0 || opcode == 1 || opcode == 2 || opcode == 3 || opcode == 6) /*for 'mov', 'add' and 'sub'*/
+    {
+        return handle_two_operand(token, array, cnt, opcode, temp_bits);
+    }
+
+    return 1;
+}
+
+int handle_one_operand(char *token, TwelveBitsStruct *array, int *cnt, int opcode, int temp_bits)
+{
+    int target_op_method;
+    char *target_op;
+
+    target_op = strtok(NULL, " ,\t\n");
+
+    if (!target_op)
+    {
+        fprintf(stderr, "Missing target operand");
+        return 0;
+    }
+
+    target_op_method = check_addressing_method(target_op);
+    temp_bits += target_op_method << 2;
+
+    array[*cnt].bits = temp_bits;
+    (*cnt)++;
+
+    if (target_op_method == 5)
+    {
+        array[*cnt].bits = (target_op[2] - '0') << 2;
+        (*cnt)++;
+    }
+    else if (target_op_method == 1)
+    {
+        if (is_valid_int(target_op)) /*If target op is int*/
+        {
+            array[*cnt].bits = atoi(target_op) << 2;
+            (*cnt)++;
+        }
+        else /*Case the target op is string*/
+        {
+            int i;
+            for (i = 1; i < (strlen(target_op) - 1); i++)
+            {
+                array[*cnt].bits = target_op[i] << 2;
+                (*cnt)++;
+            }
+        }
+    }
+    else /*Case the value is label*/
+    {
+        array[*cnt].bits = 1; /*This will act as NULL until the second run*/
         (*cnt)++;
     }
 
-    /*Check that what left of the line is ok*/
+    if (target_op_method == 1 && opcode != 12)
+    {
+        fprintf(stderr, "Invalid addressing method");
+        return 0;
+    }
+
+    token = strtok(NULL, "");
+    CHECK_END_OF_LINE(token);
+}
+
+int handle_two_operand(char *token, TwelveBitsStruct *array, int *cnt, int opcode, int temp_bits)
+{
+    int source_op_method, target_op_method;
+    char *source_op, *target_op;
+
+    source_op = strtok(NULL, " ,\t\n");
+    target_op = strtok(NULL, " ,\t\n");
+
+    if (!target_op || !source_op)
+    {
+        fprintf(stderr, "Not enough oprands");
+        return 0;
+    }
+
+    target_op_method = check_addressing_method(target_op);
+    source_op_method = check_addressing_method(source_op);
+    temp_bits += target_op_method << 2;
+    temp_bits += source_op_method << 9;
+
+    array[*cnt].bits = temp_bits;
+    (*cnt)++;
+
+    if (target_op_method == 5 && source_op_method == 5)
+    {
+        array[*cnt].bits = (((target_op[2] - '0') << 2) + ((source_op[2] - '0') << 7));
+        (*cnt)++;
+    }
+    else
+    {
+        if (target_op_method == 5)
+        {
+            array[*cnt].bits = ((target_op[2] - '0') << 2);
+            (*cnt)++;
+        }
+        if (source_op_method == 5)
+        {
+            array[*cnt].bits = ((source_op[2] - '0') << 7);
+            (*cnt)++;
+        }
+        if (target_op_method == 1)
+        {
+            if (is_valid_int(target_op)) /*If target op is int*/
+            {
+                array[*cnt].bits = atoi(target_op) << 2;
+                (*cnt)++;
+            }
+            else /*Case the target op is string*/
+            {
+                int i;
+                for (i = 1; i < (strlen(target_op) - 1); i++)
+                {
+                    array[*cnt].bits = target_op[i] << 2;
+                    (*cnt)++;
+                }
+            }
+        }
+        if (source_op_method == 1)
+        {
+            if (is_valid_int(source_op)) /*If target op is int*/
+            {
+                array[*cnt].bits = atoi(source_op) << 2;
+                (*cnt)++;
+            }
+            else /*Case the target op is string*/
+            {
+                int i;
+                for (i = 1; i < (strlen(source_op) - 1); i++)
+                {
+                    array[*cnt].bits = source_op[i] << 2;
+                    (*cnt)++;
+                }
+            }
+        }
+        if (target_op_method == 3)
+        {
+            array[*cnt].bits = 1; /*This will act as NULL until the second run*/
+            (*cnt)++;
+        }
+        if (source_op_method == 3)
+        {
+            array[*cnt].bits = 1; /*This will act as NULL until the second run*/
+            (*cnt)++;
+        }
+    }
+
+    /*Validated that all operading addressing methods are valid*/
+    if ((opcode == 0 && target_op_method == 1) || (opcode == 2 && target_op_method == 1) || (opcode == 3 && target_op_method == 1) || (opcode == 6 && target_op_method == 1) || (opcode == 6 && source_op_method == 1) || (opcode == 6 && source_op_method == 5))
+    {
+        fprintf(stderr, "Invalid addressing method");
+        return 0;
+    }
+
+    token = strtok(NULL, "");
+    CHECK_END_OF_LINE(token);
 }

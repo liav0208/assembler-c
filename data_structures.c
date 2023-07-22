@@ -47,7 +47,7 @@ int labelExists(ptr head, const char label[])
     {
         if (strcmp(current->label, label) == 0)
         {
-            return 1; /*Label already exists*/
+            return current->row; /*Label already exists*/
         }
         current = current->next;
     }

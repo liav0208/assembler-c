@@ -94,7 +94,7 @@ int is_label(char *line)
 /*Check if the label name is valid*/
 int legal_label(char label[])
 {
-    if (label[0] >= 'A' && label[0] <= 'z' && strlen(label) < 31 && opcode(label) == -1 && is_valid_register(label) == 0)
+    if (label[0] >= 'A' && label[0] <= 'z' && strlen(label) < 31 && opcode(label) == -1 && is_valid_register(label) == 0 && is_alnum_string(label))
     {
         return 1;
     }
@@ -272,7 +272,7 @@ int is_valid_int(char *num)
 {
     int i;
 
-    if (num[0] != '+' || num[0] != '-' || !isdigit(num[0]))
+    if (num[0] != '+' && num[0] != '-' && !isdigit(num[0]))
     {
         return 0;
     }
@@ -301,5 +301,40 @@ int is_valid_string(char *str)
         if (!isalpha(str[i]) && !isspace(str[i]))
             return 0;
     }
+
+    if (atoi(str) > TEN_BITS_MAX || atoi(str) < TEN_BITS_MIN)
+    {
+        return 0;
+    }
     return 1;
+}
+
+/*Check if string contain only alpha numeric character*/
+int is_alnum_string(char *str)
+{
+    int i;
+
+    for (i = 0; i < strlen(str); i++)
+    {
+        if (!isalnum(str[i]))
+            return 0;
+    }
+
+    return 1;
+}
+
+int check_addressing_method(char *str)
+{
+    if (str[0] == '@' && is_valid_register(str))
+    {
+        return 5;
+    }
+    else if (is_valid_string(str) || is_valid_int(str))
+    {
+        return 1;
+    }
+    else
+    {
+        return 3;
+    }
 }

@@ -3,6 +3,7 @@
 #include <string.h>
 #include "preassembler.h"
 #include "first_run.h"
+#include "second_run.h"
 #include "data_structures.h"
 
 int main(int argc, char *argv[])
@@ -31,14 +32,21 @@ int main(int argc, char *argv[])
 
 		if (!fptr) /*Check if there is any file with that name*/
 		{
-			fprintf(stderr, "Invalid file name: %s", filename);
+			fprintf(stderr, "Invalid file name: %s\n", filename);
 			exit(0);
 		}
 
 		/*Use the preassmbler function and provide pointer to the file and the filename the use provided*/
 		preassembler(fptr, argv[i]);
 
-		first_run(argv[i], &head, instruction_arr, data_arr, &entries_head, &extern_head);
+		if (first_run(argv[i], &head, instruction_arr, data_arr, &entries_head, &extern_head))
+		{
+			fprintf(stderr, "There aree some errors in the code\n");
+			continue;
+		}
+
+		second_run(argv[i], &head, instruction_arr, data_arr, &entries_head, &extern_head);
+
 		printList(head);
 		printf("\n------------------\n");
 		printList_2(entries_head);

@@ -2,6 +2,9 @@
   "C_Cpp.errorSquiggles": "disabled",
   "files.associations": {
     "linked_lists.h": "c",
-    "data_structures.h": "c"
+    "data_structures.h": "c",
+    "preassembler.h": "c",
+    "first_run.h": "c",
+    "string.h": "c"
   }
 }

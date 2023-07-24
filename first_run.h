@@ -16,7 +16,7 @@
         }                                             \
     }
 
-int first_run(char *fname, ptr *head, TwelveBitsStruct *instruction_arr, TwelveBitsStruct *data_arr, list_ptr *entries_head, list_ptr *extern_head);
+int first_run(char *fname, ptr *head, TwelveBitsStruct *instruction_arr, TwelveBitsStruct *data_arr, list_ptr *entries_head, list_ptr *extern_head, int *IC, int *DC);
 int validate_save_data_line(char line[], TwelveBitsStruct *array, int *cnt);
 int validate_save_instuction(char line[], TwelveBitsStruct *array, int *cnt, ptr *head, list_ptr *extern_arr);
 int handle_one_operand(char *token, TwelveBitsStruct *array, int *cnt, int opcode, int temp_bits);

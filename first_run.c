@@ -3,11 +3,11 @@
 #include "utils.h"
 #include "data_structures.h"
 
-int first_run(char *fname, ptr *head, TwelveBitsStruct *instruction_arr, TwelveBitsStruct *data_arr, list_ptr *entries_head, list_ptr *extern_head)
+int first_run(char *fname, ptr *head, TwelveBitsStruct *instruction_arr, TwelveBitsStruct *data_arr, list_ptr *entries_head, list_ptr *extern_head, int *IC, int *DC)
 {
     char filename[50], line[100];
     FILE *amfptr;
-    int DC = 0, IC = 0, line_cnt = 0, memory_place = 100;
+    int line_cnt = 0, memory_place = 100;
     int is_err = 0;
     char *label;
 
@@ -38,12 +38,12 @@ int first_run(char *fname, ptr *head, TwelveBitsStruct *instruction_arr, TwelveB
                 }
                 else
                 {
-                    insertNode(head, label, memory_place + IC + DC);
+                    insertNode(head, label, memory_place + *IC + *DC);
                 }
             }
             if (is_data(line)) /*Check if data declaration*/
             {
-                if (!validate_save_data_line(line, data_arr, &DC))
+                if (!validate_save_data_line(line, data_arr, DC))
                 {
                     is_err = 1;
                     fprintf(stderr, "line %d: Invalid data command\n", line_cnt);
@@ -92,7 +92,7 @@ int first_run(char *fname, ptr *head, TwelveBitsStruct *instruction_arr, TwelveB
             }
             else /*This line is instruction*/
             {
-                if (!validate_save_instuction(line, instruction_arr, &IC, head, extern_head))
+                if (!validate_save_instuction(line, instruction_arr, IC, head, extern_head))
                 {
                     is_err = 1;
                     fprintf(stderr, "line %d: Invalid Instruction command\n", line_cnt);

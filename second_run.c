@@ -1,5 +1,6 @@
 #include "second_run.h"
 #include "sanitizer.h"
+#include "utils.h"
 
 int second_run(char *fname, ptr *head, TwelveBitsStruct *instruction_arr, TwelveBitsStruct *data_arr, list_ptr *entries_head, list_ptr *extern_head)
 {
@@ -7,7 +8,6 @@ int second_run(char *fname, ptr *head, TwelveBitsStruct *instruction_arr, Twelve
     FILE *amfptr;
     int IC = 0, is_err = 0, opcode, source_op_method, target_op_method;
     char *source_op, *target_op;
-    int i;
 
     strcpy(filename, fname);
     strcat(filename, ".am");
@@ -57,9 +57,14 @@ int second_run(char *fname, ptr *head, TwelveBitsStruct *instruction_arr, Twelve
                 {
                     int row = 0;
 
-                    if ((row = labelExistsInList(*extern_head, target_op)) || (row = labelExists(*head, target_op)))
+                    if ((row = labelExistsInList(*extern_head, target_op)))
                     {
                         instruction_arr[IC].bits = row;
+                        IC++;
+                    }
+                    else if ((row = labelExists(*head, target_op)))
+                    {
+                        instruction_arr[IC].bits = ((row << 2) + 2);
                         IC++;
                     }
                     else
@@ -67,7 +72,6 @@ int second_run(char *fname, ptr *head, TwelveBitsStruct *instruction_arr, Twelve
                         fprintf(stderr, "invalid argument %s in line: %s\n", target_op, line);
                         is_err = 1;
                     }
-                    IC++;
                 }
             }
             else if (opcode == 0 || opcode == 1 || opcode == 2 || opcode == 3 || opcode == 6) /*Check if there are two operands*/
@@ -113,17 +117,26 @@ int second_run(char *fname, ptr *head, TwelveBitsStruct *instruction_arr, Twelve
                     {
                         IC++;
                     }
-                    if ((row = labelExistsInList(*extern_head, target_op)) || (row = labelExists(*head, target_op)))
+                    if ((row = labelExistsInList(*extern_head, target_op)))
                     {
                         instruction_arr[IC].bits = row;
                         IC++;
                     }
-                    if ((row = labelExistsInList(*extern_head, source_op)) || (row = labelExists(*head, source_op)))
+                    if ((row = labelExists(*head, target_op)))
+                    {
+                        instruction_arr[IC].bits = ((row << 2) + 2);
+                        IC++;
+                    }
+                    if ((row = labelExistsInList(*extern_head, source_op)))
                     {
                         instruction_arr[IC].bits = row;
                         IC++;
                     }
-
+                    if ((row = labelExists(*head, source_op)))
+                    {
+                        instruction_arr[IC].bits = ((row << 2) + 2);
+                        IC++;
+                    }
                     if (source_op_method == 3 && (!labelExistsInList(*extern_head, source_op) && !labelExists(*head, source_op)))
                     {
                         fprintf(stderr, "invalid argument %s in line: %s\n", source_op, line);
@@ -142,11 +155,6 @@ int second_run(char *fname, ptr *head, TwelveBitsStruct *instruction_arr, Twelve
                 IC++;
             }
         }
-    }
-
-    for (i = 0; i < IC; i++)
-    {
-        printf("\nin instruction_arr line %d is %d\n", i, instruction_arr[i].bits);
     }
 
     return is_err;

@@ -65,3 +65,20 @@ char *valid_extern_entry(const char *line)
 
     return NULL;
 }
+
+char *int12ToBase64(int int12)
+{
+    const char base64_chars[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+
+    char *base64Num = (char *)malloc(3); /*Allocate memory for 3 characters*/
+    if (!base64Num)
+    {
+        fprintf(stderr, "Memory allocation error\n");
+        exit(1);
+    }
+
+    base64Num[0] = base64_chars[(int12 >> 6) & 0x3F];
+    base64Num[1] = base64_chars[int12 & 0x3F];
+    base64Num[2] = '\n'; /*Next Line*/
+    return base64Num;
+}

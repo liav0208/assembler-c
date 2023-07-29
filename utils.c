@@ -49,7 +49,7 @@ void removeSpaces(char *str)
 
 char *valid_extern_entry(const char *line)
 {
-    char linec[100];
+    char linec[LINE_MAX_LEN];
     char *token;
 
     strcpy(linec, line);
@@ -81,4 +81,48 @@ char *int12ToBase64(int int12)
     base64Num[1] = base64_chars[int12 & 0x3F];
     base64Num[2] = '\n'; /*Next Line*/
     return base64Num;
+}
+
+int write_ob_file(char *fname, TwelveBitsStruct *instructions, TwelveBitsStruct *data, int IC, int DC)
+{
+    FILE *fptr = NULL;
+    char *line;
+    int i;
+
+    CREATE_FILE(fname, ".ob", "w", fptr);
+
+    for (i = 0; i < IC; i++)
+    {
+        line = int12ToBase64(instructions[i].bits);
+        fputs(line, fptr);
+        free(line);
+    }
+
+    for (i = 0; i < DC; i++)
+    {
+        line = int12ToBase64(data[i].bits);
+        fputs(line, fptr);
+        free(line);
+    }
+
+    fclose(fptr);
+    return 1;
+}
+
+int write_ent_ext_file(char *fname, ptr head, char *ext)
+{
+    FILE *fptr = NULL;
+    ptr current = head;
+
+    CREATE_FILE(fname, ext, "w", fptr);
+
+    while (current != NULL)
+    {
+        fprintf(fptr, "%s: %d\n", current->label, current->row);
+        current = current->next;
+    }
+
+    fclose(fptr);
+
+    return 1;
 }

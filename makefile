@@ -1,6 +1,6 @@
 assembler: assembler.o preassembler.o utils.o sanitizer.o first_run.o second_run.o data_structures.o
 	gcc assembler.o preassembler.o utils.o sanitizer.o first_run.o second_run.o data_structures.o -ansi -Wall -pedantic -o assembler
-assembler.o: assembler.c preassembler.h first_run.h data_structures.h second_run.h utils.h
+assembler.o: assembler.c preassembler.h first_run.h data_structures.h second_run.h utils.h sanitizer.h
 	gcc -c assembler.c -ansi -Wall -pedantic -o assembler.o
 preassembler.o: preassembler.c preassembler.h utils.h sanitizer.h
 	gcc -c preassembler.c -ansi -Wall -pedantic -o preassembler.o

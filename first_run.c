@@ -5,7 +5,7 @@
 
 int first_run(char *fname, ptr *head, TwelveBitsStruct *instruction_arr, TwelveBitsStruct *data_arr, list_ptr *entries_head, list_ptr *extern_head, int *IC, int *DC)
 {
-    char filename[50], line[100];
+    char filename[FILE_NAME_MAX_LEN], line[LINE_MAX_LEN];
     FILE *amfptr;
     int line_cnt = 0, memory_place = 100;
     int is_err = 0;

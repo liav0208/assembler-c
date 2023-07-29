@@ -5,12 +5,13 @@
 #include "first_run.h"
 #include "second_run.h"
 #include "data_structures.h"
+#include "sanitizer.h"
 #include "utils.h"
 
 int main(int argc, char *argv[])
 {
 	int i;
-	FILE *fptr, *objptr, *externptr, *entriesptr;
+	FILE *fptr;
 	if (argc < 2) /*Check if user provide filename into the command line*/
 	{
 		fprintf(stderr, "Missing file name in the command line parameters");
@@ -19,13 +20,13 @@ int main(int argc, char *argv[])
 
 	for (i = 1; i < argc; i++) /*Run over each filename the user provide*/
 	{
-		char filename[50];
+		char filename[FILE_NAME_MAX_LEN];
 		TwelveBitsStruct instruction_arr[FILE_LIMIT_MEMO];
 		TwelveBitsStruct data_arr[FILE_LIMIT_MEMO];
-		ptr head = NULL;
+		ptr head = NULL, extern_rows_head = NULL, entries_rows_head = NULL;
 		list_ptr entries_head = NULL;
 		list_ptr extern_head = NULL;
-		int IC = 0, DC = 0, ll;
+		int IC = 0, DC = 0;
 
 		strcpy(filename, argv[i]);
 		strcat(filename, ".as");
@@ -46,40 +47,24 @@ int main(int argc, char *argv[])
 			continue;
 		}
 
-		printf("DC is: %d and IC is: %d\n", DC, IC);
-
-		if (second_run(argv[i], &head, instruction_arr, data_arr, &entries_head, &extern_head))
+		if (second_run(argv[i], &head, instruction_arr, data_arr, &entries_head, &extern_head, &extern_rows_head))
 		{
 			fprintf(stderr, "There aree some errors in the code\n");
 			continue;
 		}
 
-		CREATE_FILE(argv[i], ".o", "w", objptr);
+		save_entries_with_rows(head, &entries_rows_head, entries_head);
 
-		for (ll = 0; ll < IC; ll++)
-		{
-			char *line = int12ToBase64(instruction_arr[ll].bits);
-			fputs(line, objptr);
-			free(line);
-		}
+		write_ob_file(argv[i], instruction_arr, data_arr, IC, DC);
+		write_ent_ext_file(argv[i], extern_rows_head, ".ext");
+		write_ent_ext_file(argv[i], entries_rows_head, ".ent");
 
-		for (ll = 0; ll < DC; ll++)
-		{
-			char *line = int12ToBase64(data_arr[ll].bits);
-			fputs(line, objptr);
-			free(line);
-		}
-
-		fclose(objptr);
 		fclose(fptr); /*Close the file*/
 
-		printf("\n------------------\n");
-
-		printList(head);
-		printf("\n------------------\n");
-		printList_2(entries_head);
-		printf("\n------------------\n");
-		printList_2(extern_head);
+		freeList(head);
+		freeList(extern_rows_head);
+		freeList2(extern_head);
+		freeList2(entries_head);
 	}
 
 	return 0;

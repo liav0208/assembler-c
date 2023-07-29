@@ -1,12 +1,18 @@
+#ifndef SANITIZER_H
+#define SANITIZER_H
+
 #include <string.h>
 #include <stdio.h>
 #include <ctype.h>
 #include <stdlib.h>
+#include "data_structures.h"
 
 #define TEN_BITS_MAX 511
 #define TEN_BITS_MIN -512
 #define TWELVE_BITS_MAX 2047
 #define TWELVE_BITS_MIN -2048
+#define LINE_MAX_LEN 100
+#define FILE_NAME_MAX_LEN 50
 
 #define CHECK_FILE(file)                                                          \
     if (!file)                                                                    \
@@ -43,3 +49,6 @@ int is_valid_int(char *num);
 int is_valid_string(char *str);
 int is_alnum_string(char *str);
 int check_addressing_method(char *str);
+int save_entries_with_rows(ptr head, ptr *entries_rows_head, list_ptr entries_head);
+
+#endif

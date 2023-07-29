@@ -22,10 +22,23 @@ void insertNode(ptr *head, const char label[], unsigned int row)
 
     if (newNode == NULL)
     {
-        return; /*Error handling*/
+        /* Error handling */
+        return;
     }
-    newNode->next = *head;
-    *head = newNode;
+
+    if (*head == NULL) /*The linked list is empty*/
+    {
+        *head = newNode; /*Update the head to point to the new node*/
+    }
+    else
+    {
+        ptr current = *head;
+        while (current->next != NULL)
+        {
+            current = current->next;
+        }
+        current->next = newNode;
+    }
 }
 
 /*Function to print the linked list*/
@@ -83,14 +96,27 @@ list_ptr createListNode(const char label[])
 /*Function to insert a node at the beginning of the list*/
 void insertListNode(list_ptr *head, const char label[])
 {
-    list_ptr newListNode = createListNode(label);
+    list_ptr newNode = createListNode(label);
 
-    if (newListNode == NULL)
+    if (newNode == NULL)
     {
-        return; /*Error handling*/
+        /* Error handling */
+        return;
     }
-    newListNode->next = *head;
-    *head = newListNode;
+
+    if (*head == NULL) /*The linked list is empty*/
+    {
+        *head = newNode; /*Update the head to point to the new node*/
+    }
+    else
+    {
+        list_ptr current = *head;
+        while (current->next != NULL)
+        {
+            current = current->next;
+        }
+        current->next = newNode;
+    }
 }
 
 /*Function to print the linked list*/

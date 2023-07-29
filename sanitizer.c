@@ -75,7 +75,7 @@ int is_data(char *line)
 /*Check if this a label declaration*/
 int is_label(char *line)
 {
-    char cpline[100];
+    char cpline[LINE_MAX_LEN];
     char *firstword;
     int wlen;
 
@@ -337,4 +337,19 @@ int check_addressing_method(char *str)
     {
         return 3;
     }
+}
+
+int save_entries_with_rows(ptr head, ptr *entries_rows_head, list_ptr entries_head)
+{
+    ptr current = head;
+
+    while (current != NULL)
+    {
+        if (labelExistsInList(entries_head, current->label))
+            insertNode(entries_rows_head, current->label, current->row);
+
+        current = current->next;
+    }
+
+    return 1;
 }

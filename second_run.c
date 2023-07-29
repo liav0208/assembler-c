@@ -2,11 +2,11 @@
 #include "sanitizer.h"
 #include "utils.h"
 
-int second_run(char *fname, ptr *head, TwelveBitsStruct *instruction_arr, TwelveBitsStruct *data_arr, list_ptr *entries_head, list_ptr *extern_head)
+int second_run(char *fname, ptr *head, TwelveBitsStruct *instruction_arr, TwelveBitsStruct *data_arr, list_ptr *entries_head, list_ptr *extern_head, ptr *extern_rows_head)
 {
-    char filename[50], line[100], *token;
+    char filename[FILE_NAME_MAX_LEN], line[LINE_MAX_LEN], *token;
     FILE *amfptr;
-    int IC = 0, is_err = 0, opcode, source_op_method, target_op_method;
+    int IC = 0, is_err = 0, opcode, source_op_method, target_op_method, memory_line = 100;
     char *source_op, *target_op;
 
     strcpy(filename, fname);
@@ -60,6 +60,7 @@ int second_run(char *fname, ptr *head, TwelveBitsStruct *instruction_arr, Twelve
                     if ((row = labelExistsInList(*extern_head, target_op)))
                     {
                         instruction_arr[IC].bits = row;
+                        insertNode(extern_rows_head, target_op, memory_line + IC);
                         IC++;
                     }
                     else if ((row = labelExists(*head, target_op)))
@@ -120,6 +121,7 @@ int second_run(char *fname, ptr *head, TwelveBitsStruct *instruction_arr, Twelve
                     if ((row = labelExistsInList(*extern_head, target_op)))
                     {
                         instruction_arr[IC].bits = row;
+                        insertNode(extern_rows_head, target_op, memory_line + IC);
                         IC++;
                     }
                     if ((row = labelExists(*head, target_op)))
@@ -130,6 +132,7 @@ int second_run(char *fname, ptr *head, TwelveBitsStruct *instruction_arr, Twelve
                     if ((row = labelExistsInList(*extern_head, source_op)))
                     {
                         instruction_arr[IC].bits = row;
+                        insertNode(extern_rows_head, target_op, memory_line + IC);
                         IC++;
                     }
                     if ((row = labelExists(*head, source_op)))

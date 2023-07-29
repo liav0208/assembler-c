@@ -9,9 +9,9 @@ original file wioth open macros.
 */
 void preassembler(FILE *fptr, char *filename)
 {
-    char line[100];
+    char line[LINE_MAX_LEN];
     FILE *amfptr;
-    char amfname[50];
+    char amfname[FILE_NAME_MAX_LEN];
     int macros_size = 5, macros_counter = 0, ismacro = 0;
     Macro *macros = (Macro *)malloc(sizeof(Macro) * macros_size); /*Create dynasmic macros array*/
 
@@ -57,7 +57,7 @@ int is_macro(char name[20], int macroCnt, Macro *macros)
 */
 void handle_line(char *line, Macro *macros, int *cnt, int *size, int *ismacro, FILE *fptr)
 {
-    char linecopy[100];
+    char linecopy[LINE_MAX_LEN];
     char *firstword;
     int macroCnt = 0;
 

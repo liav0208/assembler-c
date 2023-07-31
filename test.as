@@ -8,9 +8,13 @@ mcro m1
 sub @r1, @r4
 bne END
 endmcro
+
+mcro m2
+jmp @r5
+endmcro
 STR: .string "abcdef"
 
-
+m2
 ; test
 prn -5
 bne LOOP

@@ -157,7 +157,7 @@ int validate_save_data_line(char line[], TwelveBitsStruct *array, int *cnt)
 
         for (i = 0; i < strlen(definition); i++) /*Loop over the data and validated if the data is ok*/
         {
-            if (definition[i] != ',' && definition[i] != '-' && !isdigit(definition[i]))
+            if (definition[i] != ',' && definition[i] != '-' && definition[i] != '+' && !isdigit(definition[i]))
             {
                 printf("\nInvalid definition of .data\n");
                 return 0;
@@ -165,10 +165,10 @@ int validate_save_data_line(char line[], TwelveBitsStruct *array, int *cnt)
         }
 
         num = strtok(definition, " ,\t\n");
-        while (num)
+        while (num) /*Loop while there are numbers in the data*/
         {
             converted_num = atoi(num);
-            if (converted_num > TWELVE_BITS_MAX || converted_num < TWELVE_BITS_MIN)
+            if (converted_num > TWELVE_BITS_MAX || converted_num < TWELVE_BITS_MIN) /*Validated that the number is valid*/
             {
                 fprintf(stderr, "\nThe number: %d is invalid\n", converted_num);
                 return 0;
@@ -185,17 +185,21 @@ int validate_save_data_line(char line[], TwelveBitsStruct *array, int *cnt)
     return 1;
 }
 
+/*
+    Validate instruction line and save into the list
+*/
 int validate_save_instuction(char line[], TwelveBitsStruct *array, int *cnt, ptr *head, list_ptr *extern_arr)
 {
-    char *token;
+    char *token, operands[LINE_MAX_LEN];
     int opcode, temp_bits = 0;
 
-    token = strtok(line, " \t");
+    strcpy(operands, line);
+    token = strtok(line, " \t\n");
 
     /*Check if the first word is label definition*/
     if (token[strlen(token) - 1] == ':')
     {
-        token = strtok(NULL, " \t");
+        token = strtok(NULL, " \t\n");
     }
 
     remove_new_line(token);
@@ -221,6 +225,7 @@ int validate_save_instuction(char line[], TwelveBitsStruct *array, int *cnt, ptr
         CHECK_END_OF_LINE(token);
     }
 
+    /*for 'not', 'clr', 'inc', 'dec', 'jmp', 'bne', 'red', 'jsr', 'prn'*/
     if (opcode == 4 || opcode == 5 || opcode == 7 || opcode == 8 || opcode == 9 || opcode == 10 || opcode == 11 || opcode == 13 || opcode == 12)
     {
         return handle_one_operand(token, array, cnt, opcode, temp_bits);
@@ -228,37 +233,43 @@ int validate_save_instuction(char line[], TwelveBitsStruct *array, int *cnt, ptr
 
     if (opcode == 0 || opcode == 1 || opcode == 2 || opcode == 3 || opcode == 6) /*for 'mov', 'add' and 'sub'*/
     {
+        if (!validate_two_operands(operands, token))
+        {
+            fprintf(stderr, "Invalid amount of commas\n");
+            return 0;
+        }
         return handle_two_operand(token, array, cnt, opcode, temp_bits);
     }
 
     return 1;
 }
 
+/*Handle instructions line that have only one operand*/
 int handle_one_operand(char *token, TwelveBitsStruct *array, int *cnt, int opcode, int temp_bits)
 {
     int target_op_method;
     char *target_op;
 
-    target_op = strtok(NULL, " ,\t\n");
+    target_op = strtok(NULL, " ,\t\n"); /*Get the operand*/
 
-    if (!target_op)
+    if (!target_op) /*Validate if there is operand*/
     {
         fprintf(stderr, "Missing target operand");
         return 0;
     }
 
-    target_op_method = check_addressing_method(target_op);
+    target_op_method = check_addressing_method(target_op); /*Check if the operand is direct, register or label*/
     temp_bits += target_op_method << 2;
 
     array[*cnt].bits = temp_bits;
     (*cnt)++;
 
-    if (target_op_method == 5)
+    if (target_op_method == 5) /*If operand is label*/
     {
         array[*cnt].bits = (target_op[2] - '0') << 2;
         (*cnt)++;
     }
-    else if (target_op_method == 1)
+    else if (target_op_method == 1) /*If operand is direct*/
     {
         if (is_valid_int(target_op)) /*If target op is int*/
         {
@@ -287,24 +298,27 @@ int handle_one_operand(char *token, TwelveBitsStruct *array, int *cnt, int opcod
         return 0;
     }
 
-    token = strtok(NULL, "");
+    token = strtok(NULL, ""); /*Get thje end of the line*/
     CHECK_END_OF_LINE(token);
 }
 
+/*Handle instructions line that have two operand*/
 int handle_two_operand(char *token, TwelveBitsStruct *array, int *cnt, int opcode, int temp_bits)
 {
     int source_op_method, target_op_method;
     char *source_op, *target_op;
 
+    /*Get source and target operand*/
     source_op = strtok(NULL, " ,\t\n");
     target_op = strtok(NULL, " ,\t\n");
 
-    if (!target_op || !source_op)
+    if (!target_op || !source_op) /*Validated that we got two operand*/
     {
         fprintf(stderr, "Not enough oprands");
         return 0;
     }
 
+    /*Get operands addressing methods*/
     target_op_method = check_addressing_method(target_op);
     source_op_method = check_addressing_method(source_op);
     temp_bits += target_op_method << 2;
@@ -383,6 +397,7 @@ int handle_two_operand(char *token, TwelveBitsStruct *array, int *cnt, int opcod
         return 0;
     }
 
+    /*Get end of line*/
     token = strtok(NULL, "");
     CHECK_END_OF_LINE(token);
 }

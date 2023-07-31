@@ -43,21 +43,26 @@ int main(int argc, char *argv[])
 
 		if (first_run(argv[i], &head, instruction_arr, data_arr, &entries_head, &extern_head, &IC, &DC))
 		{
-			fprintf(stderr, "There aree some errors in the code\n");
+			fprintf(stderr, "There are some errors in the code\n");
 			continue;
 		}
 
 		if (second_run(argv[i], &head, instruction_arr, data_arr, &entries_head, &extern_head, &extern_rows_head))
 		{
-			fprintf(stderr, "There aree some errors in the code\n");
+			fprintf(stderr, "There are some errors in the code\n");
 			continue;
 		}
 
 		save_entries_with_rows(head, &entries_rows_head, entries_head);
 
-		write_ob_file(argv[i], instruction_arr, data_arr, IC, DC);
-		write_ent_ext_file(argv[i], extern_rows_head, ".ext");
-		write_ent_ext_file(argv[i], entries_rows_head, ".ent");
+		/*In case there was an issue with removing the file*/
+		if (!write_ob_file(argv[i], instruction_arr, data_arr, IC, DC) || !write_ent_ext_file(argv[i], extern_rows_head, ".ext") || !write_ent_ext_file(argv[i], entries_rows_head, ".ent"))
+		{
+			remove(strcat(argv[i], ".ob"));
+			remove(strcat(argv[i], ".am"));
+			remove(strcat(argv[i], ".ent"));
+			remove(strcat(argv[i], ".ext"));
+		}
 
 		fclose(fptr); /*Close the file*/
 

@@ -1,6 +1,7 @@
 #include "utils.h"
 #include "sanitizer.h"
 
+/*strcmp that ignore \n symbol*/
 int strcmp_ignore_newline(const char *str1, const char *str2)
 {
     size_t len1 = strlen(str1);
@@ -47,25 +48,7 @@ void removeSpaces(char *str)
     str[count] = '\0'; /* mark the end of str */
 }
 
-char *valid_extern_entry(const char *line)
-{
-    char linec[LINE_MAX_LEN];
-    char *token;
-
-    strcpy(linec, line);
-    skipSpaces(linec);
-
-    token = strtok(linec, " ");
-    if (strcmp(token, "entry") == 0)
-    {
-    }
-    else if (strcmp(token, "extern") == 0)
-    {
-    }
-
-    return NULL;
-}
-
+/*Convert 12 bits to base 64 and return the base64 version*/
 char *int12ToBase64(int int12)
 {
     const char base64_chars[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
@@ -83,22 +66,23 @@ char *int12ToBase64(int int12)
     return base64Num;
 }
 
+/*Write ob file with the relevant data*/
 int write_ob_file(char *fname, TwelveBitsStruct *instructions, TwelveBitsStruct *data, int IC, int DC)
 {
     FILE *fptr = NULL;
     char *line;
     int i;
 
-    CREATE_FILE(fname, ".ob", "w", fptr);
+    CREATE_FILE(fname, ".ob", "w", fptr); /*Create the .ob file*/
 
-    for (i = 0; i < IC; i++)
+    for (i = 0; i < IC; i++) /*Loop over the instructions and write them to the file*/
     {
         line = int12ToBase64(instructions[i].bits);
         fputs(line, fptr);
         free(line);
     }
 
-    for (i = 0; i < DC; i++)
+    for (i = 0; i < DC; i++) /*Loop over the data and write them to the file*/
     {
         line = int12ToBase64(data[i].bits);
         fputs(line, fptr);
@@ -109,20 +93,24 @@ int write_ob_file(char *fname, TwelveBitsStruct *instructions, TwelveBitsStruct 
     return 1;
 }
 
+/*Write into entries or extern file*/
 int write_ent_ext_file(char *fname, ptr head, char *ext)
 {
     FILE *fptr = NULL;
     ptr current = head;
 
-    CREATE_FILE(fname, ext, "w", fptr);
-
-    while (current != NULL)
+    if (current != NULL) /*Create the file only if the list not empty*/
     {
-        fprintf(fptr, "%s: %d\n", current->label, current->row);
-        current = current->next;
-    }
+        CREATE_FILE(fname, ext, "w", fptr);
 
-    fclose(fptr);
+        while (current != NULL)
+        {
+            fprintf(fptr, "%s: %d\n", current->label, current->row);
+            current = current->next;
+        }
+
+        fclose(fptr);
+    }
 
     return 1;
 }

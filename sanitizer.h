@@ -14,22 +14,12 @@
 #define LINE_MAX_LEN 100
 #define FILE_NAME_MAX_LEN 50
 
+/*Macro for checking that file created successfully*/
 #define CHECK_FILE(file)                                                          \
     if (!file)                                                                    \
     {                                                                             \
         fprintf(stderr, "Failed on create .am file due Memory allocation issue"); \
         exit(0);                                                                  \
-    }
-
-#define SAVE_PARAM(param)                                      \
-    {                                                          \
-        param = strtok(NULL, " ,\t\n");                        \
-                                                               \
-        if (!param)                                            \
-        {                                                      \
-            fprintf(stderr, "Invalid amount of parameters\n"); \
-            return 0;                                          \
-        }                                                      \
     }
 
 int opcode(char ch[]);
@@ -43,12 +33,11 @@ char *get_label_name(const char *str);
 int is_valid_register(char register[]);
 int get_opcode(const char opcode[]);
 int is_valid_number(char str[]);
-int find_addressing_mode(char str[]);
 void remove_new_line(char *str);
 int is_valid_int(char *num);
 int is_valid_string(char *str);
 int is_alnum_string(char *str);
 int check_addressing_method(char *str);
 int save_entries_with_rows(ptr head, ptr *entries_rows_head, list_ptr entries_head);
-
+int validate_two_operands(const char *line, const char *op);
 #endif

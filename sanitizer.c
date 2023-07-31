@@ -234,26 +234,6 @@ int get_opcode(const char opcode[])
     }
 }
 
-int find_addressing_mode(char str[])
-{
-    if (is_valid_register(str))
-    {
-        return 5;
-    }
-    else if (legal_label(str))
-    {
-        return 3;
-    }
-    else if (is_valid_number(str))
-    {
-        return 1;
-    }
-    else
-    {
-        return 0;
-    }
-}
-
 void remove_new_line(char *str)
 {
     int i, count = 0;
@@ -323,22 +303,24 @@ int is_alnum_string(char *str)
     return 1;
 }
 
+/*Check the addressing method of operand*/
 int check_addressing_method(char *str)
 {
-    if (str[0] == '@' && is_valid_register(str))
+    if (str[0] == '@' && is_valid_register(str)) /*If register*/
     {
         return 5;
     }
-    else if (is_valid_string(str) || is_valid_int(str))
+    else if (is_valid_string(str) || is_valid_int(str)) /*if direct*/
     {
         return 1;
     }
-    else
+    else /*if label*/
     {
         return 3;
     }
 }
 
+/*Add entries with the relevant row in memory to link list*/
 int save_entries_with_rows(ptr head, ptr *entries_rows_head, list_ptr entries_head)
 {
     ptr current = head;
@@ -352,4 +334,64 @@ int save_entries_with_rows(ptr head, ptr *entries_rows_head, list_ptr entries_he
     }
 
     return 1;
+}
+
+/*Validate valid comma seperator*/
+int validate_two_operands(const char *line, const char *op)
+{
+    int op_len = strlen(op), line_len = strlen(line), i, comma_cnt = 0;
+
+    for (i = 0; i <= line_len - op_len; i++) /*skip all words to after opcode*/
+    {
+        if (strncmp(line + i, op, op_len) == 0)
+        {
+            break;
+        }
+    }
+
+    i += op_len;
+
+    /*Skip spaces*/
+    while (line[i] == ' ' || line[i] == '\t')
+        i++;
+
+    if (line[i] == ',') /*Invalid comma after operator*/
+    {
+        fprintf(stderr, "Invalid comma");
+        return 0;
+    }
+
+    /*skip first word*/
+    while (line[i] != ' ' && line[i] != '\t' && line[i] != ',')
+    {
+        i++;
+    }
+
+    if (line[i] == '\n')
+    {
+        fprintf(stderr, "Invalid end of line");
+        return 0;
+    }
+
+    /*Skip spaces*/
+    while (line[i] == ' ' || line[i] == '\t')
+        i++;
+
+    if (line[i] == ',') /*Check if char is comma*/
+    {
+        comma_cnt++;
+        i++;
+    }
+
+    /*Skip spaces*/
+    while (line[i] == ' ' || line[i] == '\t')
+        i++;
+
+    if (line[i] == ',') /*Check if char is comma for extra comma*/
+    {
+        comma_cnt++;
+        i++;
+    }
+
+    return comma_cnt == 1;
 }

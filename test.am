@@ -5,6 +5,7 @@ LOOP: jmp L1
 jmp @r5
 K: .data 22
 STR: .string "abcdef"
+jmp @r5
 prn -5
 bne LOOP
 .string "test"

@@ -286,8 +286,13 @@ int is_alnum_string(char *str)
 /*Check the addressing method of operand*/
 int check_addressing_method(char *str)
 {
-    if (str[0] == '@' && is_valid_register(str)) /*If register*/
+    if (str[0] == '@') /*If register*/
     {
+        if (!is_valid_register(str))
+        {
+            fprintf(stderr, "Invalid register: %s\n", str);
+            return 0;
+        }
         return 5;
     }
     else if (is_valid_string(str) || is_valid_int(str)) /*if direct*/

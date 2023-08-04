@@ -22,6 +22,15 @@
         exit(0);                                                                  \
     }
 
+/*Validate the addressing method is valid*/
+#define VALIDATE_ADDRESS_METHOD(method) \
+    {                                   \
+        if (!method)                    \
+        {                               \
+            return 0;                   \
+        }                               \
+    }
+
 int opcode(char ch[]);
 int is_empty(char *line);
 int is_comment(char *line);

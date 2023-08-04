@@ -276,6 +276,7 @@ int handle_one_operand(char *token, TwelveBitsStruct *array, int *cnt, int opcod
     }
 
     target_op_method = check_addressing_method(target_op); /*Check if the operand is direct, register or label*/
+    VALIDATE_ADDRESS_METHOD(target_op_method);
     temp_bits += target_op_method << 2;
 
     array[*cnt].bits = temp_bits;
@@ -338,6 +339,9 @@ int handle_two_operand(char *token, TwelveBitsStruct *array, int *cnt, int opcod
     /*Get operands addressing methods*/
     target_op_method = check_addressing_method(target_op);
     source_op_method = check_addressing_method(source_op);
+    VALIDATE_ADDRESS_METHOD(target_op_method);
+    VALIDATE_ADDRESS_METHOD(source_op_method);
+
     temp_bits += target_op_method << 2;
     temp_bits += source_op_method << 9;
 

@@ -27,6 +27,7 @@ int main(int argc, char *argv[])
 		list_ptr entries_head = NULL;
 		list_ptr extern_head = NULL;
 		int IC = 0, DC = 0;
+		fptr = NULL;
 
 		strcpy(filename, argv[i]);
 		strcat(filename, ".as");
@@ -44,12 +45,24 @@ int main(int argc, char *argv[])
 		if (first_run(argv[i], &head, instruction_arr, data_arr, &entries_head, &extern_head, &IC, &DC))
 		{
 			fprintf(stderr, "There are some errors in the code\n");
+			remove(strcat(argv[i], ".am"));
+			EMPTY_REMOVE(fptr, head, extern_rows_head,
+						 entries_rows_head, entries_head,
+						 extern_head, instruction_arr,
+						 data_arr);
+
 			continue;
 		}
 
 		if (second_run(argv[i], &head, instruction_arr, data_arr, &entries_head, &extern_head, &extern_rows_head))
 		{
 			fprintf(stderr, "There are some errors in the code\n");
+			remove(strcat(argv[i], ".am"));
+			EMPTY_REMOVE(fptr, head, extern_rows_head,
+						 entries_rows_head, entries_head,
+						 extern_head, instruction_arr,
+						 data_arr);
+
 			continue;
 		}
 
@@ -64,12 +77,10 @@ int main(int argc, char *argv[])
 			remove(strcat(argv[i], ".ext"));
 		}
 
-		fclose(fptr); /*Close the file*/
-
-		freeList(head);
-		freeList(extern_rows_head);
-		freeList2(extern_head);
-		freeList2(entries_head);
+		EMPTY_REMOVE(fptr, head, extern_rows_head,
+					 entries_rows_head, entries_head,
+					 extern_head, instruction_arr,
+					 data_arr);
 	}
 
 	return 0;

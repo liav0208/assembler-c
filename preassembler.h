@@ -6,7 +6,7 @@
 typedef struct macro
 {
     char name[10];
-    char text[200];
+    char text[500]; /*Macro lines are limited to 500 characters*/
 } Macro;
 
 /*Recive macros array, macros size and macros counter and check if need to realloc the macros to bigger array*/

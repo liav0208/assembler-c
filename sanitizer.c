@@ -94,7 +94,7 @@ int is_label(char *line)
 /*Check if the label name is valid*/
 int legal_label(char label[])
 {
-    if (label[0] >= 'A' && label[0] <= 'z' && strlen(label) < 31 && opcode(label) == -1 && is_valid_register(label) == 0 && is_alnum_string(label))
+    if (label[0] >= 'A' && label[0] <= 'z' && strlen(label) < 31 && opcode(label) == -1 && is_valid_register(label) == 0 && is_alnum_string(label) && strcmp(label, ".entry") != 0 && strcmp(label, ".extern") != 0)
     {
         return 1;
     }
@@ -140,26 +140,6 @@ char *get_label_name(const char *str)
     strncpy(word, str, i);
     word[i] = '\0';
     return word;
-}
-
-int is_valid_number(char str[])
-{
-    int i;
-
-    for (i = 0; i < strlen(str); i++)
-    {
-        if (i == 0)
-        {
-            if (str[i] != '-' && !isdigit(str[i]))
-                return 0;
-        }
-        else if (!isdigit(str[i]))
-        {
-            return 0;
-        }
-    }
-
-    return 1;
 }
 
 int get_opcode(const char opcode[])
@@ -357,7 +337,6 @@ int validate_two_operands(const char *line, const char *op)
 
     if (line[i] == ',') /*Invalid comma after operator*/
     {
-        fprintf(stderr, "Invalid comma");
         return 0;
     }
 
@@ -369,7 +348,7 @@ int validate_two_operands(const char *line, const char *op)
 
     if (line[i] == '\n')
     {
-        fprintf(stderr, "Invalid end of line");
+        fprintf(stderr, "Missing operands\n");
         return 0;
     }
 
@@ -394,4 +373,76 @@ int validate_two_operands(const char *line, const char *op)
     }
 
     return comma_cnt == 1;
+}
+
+/* Validate that the line contains numbers separated by commas.
+   Returns 1 if the line is valid, 0 otherwise. */
+int validate_numbers_separated_by_comma(const char *line)
+{
+    int i = 0;
+    int foundNumber = 0;   /* Indicates whether a number is found */
+    int foundComma = 0;    /* Indicates whether a comma is found */
+    int lastWasNumber = 0; /* Indicates whether the last character was a number */
+
+    while (line[i] != '\0')
+    {
+        if (isdigit(line[i]))
+        {
+            if (lastWasNumber && foundComma)
+            {
+                /* Two numbers are not allowed to be separated by more than one comma */
+                fprintf(stderr, "Invalid format: More than one comma between two numbers\n");
+                return 0;
+            }
+            lastWasNumber = 1;
+            foundNumber = 1; /* Number is found */
+            foundComma = 0;  /* Reset comma flag */
+            while (isdigit(line[i]))
+                i++; /* Skip digits */
+        }
+        else if (line[i] == ' ' || line[i] == '\t')
+        {
+            /* Skip spaces and tabs */
+            i++;
+        }
+        else if (line[i] == ',')
+        {
+            if (!foundNumber)
+            {
+                /* Number is missing before comma */
+                fprintf(stderr, "Invalid format: Number is missing before comma\n");
+                return 0;
+            }
+            if (foundComma)
+            {
+                /* Too many commas */
+                fprintf(stderr, "Invalid format: Too many comma\n");
+                return 0;
+            }
+            lastWasNumber = 0;
+            foundComma = 1; /* Comma is found */
+            i++;            /* Move to the next character after the comma */
+        }
+        else
+        {
+            if (line[i] == '-' && foundComma)
+            {
+                i++;
+            }
+            else
+            {
+                return 0;
+            }
+        }
+    }
+
+    if (!foundNumber || !lastWasNumber || foundComma)
+    {
+        /* Number is missing after comma or last character was a comma */
+        fprintf(stderr, "Invalid format: Number is missing after comma or last character was a comma\n");
+        return 0;
+    }
+
+    /* Line is valid */
+    return 1;
 }

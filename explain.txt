@@ -1,0 +1,16 @@
+Assembler Project:
+This folder contain the source code for the assembler for "MAMAN 14, 2023 b"
+In order to test this assembler i created some test files:
+
+Errors:
+e1.as e1-output.txt -> The e1.as file is the assembly file that contain some errors and the e1-output.txt is the output from the terminal 
+e2.as e2-output.txt -> The e2.as file is the assembly file that contain some errors and the e2-output.txt is the output from the terminal 
+e3.as e3-output.txt -> The e3.as file is the assembly file that contain some errors and the e3-output.txt is the output from the terminal 
+
+Succes:
+t1.as t2.as t3.as -> those are example for files that compiled successfully without any issue or error, each of the file will get .am and .ob file with the same name.
+if needed there will also be .ent and .ext files
+
+Warn:
+w1.as w2.as -> those files are files that contain some "Warning" but still manage to compiled, those files will create .am .ob .ent & .ext files but also will create 
+[name]-output.txt files with the terminal output as well.

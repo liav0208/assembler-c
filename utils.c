@@ -20,19 +20,6 @@ int strcmp_ignore_newline(const char *str1, const char *str2)
 }
 
 /*
-    skip all the spaces and tabs in the incoming string
-    get pointer to string and chage his value.
-*/
-void skipSpaces(char *str)
-{
-    int i;
-    for (i = 0; str[i] != ' ' && str[i] != '\t'; i++)
-    {
-        str++;
-    }
-}
-
-/*
     get pointer to string and transform the string to remove all the white spaces and add \0 at the end
 */
 void removeSpaces(char *str)

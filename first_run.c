@@ -7,7 +7,7 @@ int first_run(char *fname, ptr *head, TwelveBitsStruct *instruction_arr, TwelveB
 {
     char filename[FILE_NAME_MAX_LEN], line[LINE_MAX_LEN];
     FILE *amfptr;
-    int line_cnt = 0, memory_place = 100;
+    int line_cnt = 1, memory_place = 100;
     int is_err = 0;
     char *label;
 
@@ -31,6 +31,10 @@ int first_run(char *fname, ptr *head, TwelveBitsStruct *instruction_arr, TwelveB
                     is_err = 1;
                     fprintf(stderr, "line %d: label %s already exist\n", line_cnt, label);
                 }
+                else if (is_extern_or_entry(line))
+                {
+                    fprintf(stderr, "line %d: This is extern\\entry line, The label will not save\n", line_cnt);
+                }
                 else if (!legal_label(label))
                 {
                     is_err = 1;
@@ -43,7 +47,7 @@ int first_run(char *fname, ptr *head, TwelveBitsStruct *instruction_arr, TwelveB
             }
             if (is_data(line)) /*Check if data declaration*/
             {
-                if (!validate_save_data_line(line, data_arr, DC))
+                if (!validate_save_data_line(line, data_arr, DC, line_cnt))
                 {
                     is_err = 1;
                     fprintf(stderr, "line %d: Invalid data command\n", line_cnt);
@@ -53,11 +57,19 @@ int first_run(char *fname, ptr *head, TwelveBitsStruct *instruction_arr, TwelveB
             {
                 char *cmd, *symbol;
 
+                if (is_label(line))
+                {
+                    cmd = strtok(line, " \t\n");
+                    cmd = strtok(NULL, " \t\n");
+                }
+                else
+                {
+                    cmd = strtok(line, " \t\n");
+                }
                 /*Get the cmd and symbol from the line*/
-                cmd = strtok(line, " \t\n");
                 symbol = strtok(NULL, " \t\n");
 
-                if (!legal_label(symbol)) /*Check if the symbol already exist*/
+                if (!legal_label(symbol)) /*Check if the symbol is legal*/
                 {
                     is_err = 1;
                     fprintf(stderr, "line %d: label %s is illegal\n", line_cnt, symbol);
@@ -69,7 +81,7 @@ int first_run(char *fname, ptr *head, TwelveBitsStruct *instruction_arr, TwelveB
                         if (labelExistsInList(*entries_head, symbol)) /*Check if the symbol already exist*/
                         {
                             is_err = 1;
-                            fprintf(stderr, "line %d: label %s is illegal\n", line_cnt, symbol);
+                            fprintf(stderr, "line %d: entry label %s Already declared\n", line_cnt, symbol);
                         }
                         else
                         {
@@ -81,7 +93,7 @@ int first_run(char *fname, ptr *head, TwelveBitsStruct *instruction_arr, TwelveB
                         if (labelExistsInList(*extern_head, symbol)) /*Check if the symbol already exist*/
                         {
                             is_err = 1;
-                            fprintf(stderr, "line %d: label %s is illegal\n", line_cnt, symbol);
+                            fprintf(stderr, "line %d: extern label %s Already declared\n", line_cnt, symbol);
                         }
                         else
                         {
@@ -92,7 +104,7 @@ int first_run(char *fname, ptr *head, TwelveBitsStruct *instruction_arr, TwelveB
             }
             else /*This line is instruction*/
             {
-                if (!validate_save_instuction(line, instruction_arr, IC, head, extern_head))
+                if (!validate_save_instuction(line, instruction_arr, IC, head, extern_head, line_cnt))
                 {
                     is_err = 1;
                     fprintf(stderr, "line %d: Invalid Instruction command\n", line_cnt);
@@ -110,15 +122,15 @@ int first_run(char *fname, ptr *head, TwelveBitsStruct *instruction_arr, TwelveB
 Validate and save data line.
 go over the line and validated that the data is fine and split it andd add it to the data array
 */
-int validate_save_data_line(char line[], TwelveBitsStruct *array, int *cnt)
+int validate_save_data_line(char line[], TwelveBitsStruct *array, int *cnt, int line_cnt)
 {
     char *first_word, *definition;
 
-    first_word = strtok(line, " \t");
+    first_word = strtok(line, " \t\n");
 
     if (first_word[strlen(first_word) - 1] == ':')
     {
-        first_word = strtok(NULL, " \t");
+        first_word = strtok(NULL, " \t\n");
     }
 
     if (strcmp(first_word, ".data") != 0 && strcmp(first_word, ".string") != 0)
@@ -135,7 +147,7 @@ int validate_save_data_line(char line[], TwelveBitsStruct *array, int *cnt)
 
         if (definition[0] != '"' || definition[strlen(definition) - 1] != '"') /*Check if the string data is not valid*/
         {
-            printf("Invalid .string definition\n");
+            printf("Invalid .string definition in line: %d\n", line_cnt);
             return 0;
         }
         while (definition[i] != '\"') /*Loop over the string and save each character into the array*/
@@ -159,18 +171,23 @@ int validate_save_data_line(char line[], TwelveBitsStruct *array, int *cnt)
         {
             if (definition[i] != ',' && definition[i] != '-' && definition[i] != '+' && !isdigit(definition[i]))
             {
-                printf("\nInvalid definition of .data\n");
+                printf("\nInvalid definition of .data in line: %d\n", line_cnt);
                 return 0;
             }
         }
 
+        if (!validate_numbers_separated_by_comma(definition))
+        {
+            fprintf(stderr, "The .data definition in line: %d is invalid and missing seperated commas\n", line_cnt);
+            return 0;
+        }
         num = strtok(definition, " ,\t\n");
         while (num) /*Loop while there are numbers in the data*/
         {
             converted_num = atoi(num);
             if (converted_num > TWELVE_BITS_MAX || converted_num < TWELVE_BITS_MIN) /*Validated that the number is valid*/
             {
-                fprintf(stderr, "\nThe number: %d is invalid\n", converted_num);
+                fprintf(stderr, "\nThe number: %d is invalid in line: %d\n", converted_num, line_cnt);
                 return 0;
             }
             else
@@ -188,7 +205,7 @@ int validate_save_data_line(char line[], TwelveBitsStruct *array, int *cnt)
 /*
     Validate instruction line and save into the list
 */
-int validate_save_instuction(char line[], TwelveBitsStruct *array, int *cnt, ptr *head, list_ptr *extern_arr)
+int validate_save_instuction(char line[], TwelveBitsStruct *array, int *cnt, ptr *head, list_ptr *extern_arr, int line_cnt)
 {
     char *token, operands[LINE_MAX_LEN];
     int opcode, temp_bits = 0;
@@ -208,7 +225,7 @@ int validate_save_instuction(char line[], TwelveBitsStruct *array, int *cnt, ptr
     /*Check if opcode is valid*/
     if (opcode == -1)
     {
-        fprintf(stderr, "\nOpcode %s is not valid\n", token);
+        fprintf(stderr, "\nOpcode %s is not valid in line: %d\n", token, line_cnt);
         return 0;
     }
 
@@ -228,24 +245,24 @@ int validate_save_instuction(char line[], TwelveBitsStruct *array, int *cnt, ptr
     /*for 'not', 'clr', 'inc', 'dec', 'jmp', 'bne', 'red', 'jsr', 'prn'*/
     if (opcode == 4 || opcode == 5 || opcode == 7 || opcode == 8 || opcode == 9 || opcode == 10 || opcode == 11 || opcode == 13 || opcode == 12)
     {
-        return handle_one_operand(token, array, cnt, opcode, temp_bits);
+        return handle_one_operand(token, array, cnt, opcode, temp_bits, line_cnt);
     }
 
     if (opcode == 0 || opcode == 1 || opcode == 2 || opcode == 3 || opcode == 6) /*for 'mov', 'add' and 'sub'*/
     {
         if (!validate_two_operands(operands, token))
         {
-            fprintf(stderr, "Invalid amount of commas\n");
+            fprintf(stderr, "Invalid amount of commas or argument in line: %d\n", line_cnt);
             return 0;
         }
-        return handle_two_operand(token, array, cnt, opcode, temp_bits);
+        return handle_two_operand(token, array, cnt, opcode, temp_bits, line_cnt);
     }
 
     return 1;
 }
 
 /*Handle instructions line that have only one operand*/
-int handle_one_operand(char *token, TwelveBitsStruct *array, int *cnt, int opcode, int temp_bits)
+int handle_one_operand(char *token, TwelveBitsStruct *array, int *cnt, int opcode, int temp_bits, int line_cnt)
 {
     int target_op_method;
     char *target_op;
@@ -254,7 +271,7 @@ int handle_one_operand(char *token, TwelveBitsStruct *array, int *cnt, int opcod
 
     if (!target_op) /*Validate if there is operand*/
     {
-        fprintf(stderr, "Missing target operand");
+        fprintf(stderr, "Missing target operand in line: %d\n", line_cnt);
         return 0;
     }
 
@@ -294,7 +311,7 @@ int handle_one_operand(char *token, TwelveBitsStruct *array, int *cnt, int opcod
 
     if (target_op_method == 1 && opcode != 12)
     {
-        fprintf(stderr, "Invalid addressing method");
+        fprintf(stderr, "Invalid addressing method in line: %d\n", line_cnt);
         return 0;
     }
 
@@ -303,7 +320,7 @@ int handle_one_operand(char *token, TwelveBitsStruct *array, int *cnt, int opcod
 }
 
 /*Handle instructions line that have two operand*/
-int handle_two_operand(char *token, TwelveBitsStruct *array, int *cnt, int opcode, int temp_bits)
+int handle_two_operand(char *token, TwelveBitsStruct *array, int *cnt, int opcode, int temp_bits, int line_cnt)
 {
     int source_op_method, target_op_method;
     char *source_op, *target_op;
@@ -314,7 +331,7 @@ int handle_two_operand(char *token, TwelveBitsStruct *array, int *cnt, int opcod
 
     if (!target_op || !source_op) /*Validated that we got two operand*/
     {
-        fprintf(stderr, "Not enough oprands");
+        fprintf(stderr, "Not enough oprands in line: %d\n", line_cnt);
         return 0;
     }
 
@@ -393,7 +410,7 @@ int handle_two_operand(char *token, TwelveBitsStruct *array, int *cnt, int opcod
     /*Validated that all operading addressing methods are valid*/
     if ((opcode == 0 && target_op_method == 1) || (opcode == 2 && target_op_method == 1) || (opcode == 3 && target_op_method == 1) || (opcode == 6 && target_op_method == 1) || (opcode == 6 && source_op_method == 1) || (opcode == 6 && source_op_method == 5))
     {
-        fprintf(stderr, "Invalid addressing method");
+        fprintf(stderr, "Invalid addressing method in line: %d\n", line_cnt);
         return 0;
     }
 

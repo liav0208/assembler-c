@@ -39,5 +39,6 @@ void insertListNode(list_ptr *head, const char label[]);
 void printList_2(list_ptr head);
 int labelExistsInList(list_ptr head, const char label[]);
 void freeList2(list_ptr head);
+void empty_TB_arr(TwelveBitsStruct arr[]);
 
 #endif /* DATA_STRUCTURES_H */

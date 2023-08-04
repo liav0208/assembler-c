@@ -32,7 +32,6 @@ int is_extern_or_entry(char *line);
 char *get_label_name(const char *str);
 int is_valid_register(char register[]);
 int get_opcode(const char opcode[]);
-int is_valid_number(char str[]);
 void remove_new_line(char *str);
 int is_valid_int(char *num);
 int is_valid_string(char *str);
@@ -40,4 +39,5 @@ int is_alnum_string(char *str);
 int check_addressing_method(char *str);
 int save_entries_with_rows(ptr head, ptr *entries_rows_head, list_ptr entries_head);
 int validate_two_operands(const char *line, const char *op);
+int validate_numbers_separated_by_comma(const char *line);
 #endif

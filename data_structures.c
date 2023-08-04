@@ -156,3 +156,13 @@ void freeList2(list_ptr head)
         free(temp);
     }
 }
+
+/*Set all TB arr records to 0*/
+void empty_TB_arr(TwelveBitsStruct arr[])
+{
+    int i;
+    for (i = 0; i < 1000; i++)
+    {
+        arr[i].bits = 0;
+    }
+}

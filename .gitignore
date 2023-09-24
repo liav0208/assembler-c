@@ -1,4 +1,9 @@
 *.o
+*.ob
 *.am
 *.as
-.vscode/*
+*.png
+*.ent
+*.ext
+.vscode
+.idea
